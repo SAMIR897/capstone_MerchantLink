@@ -1,6 +1,9 @@
-![MerchantLink Banner](./banner.png)
+<h1 align="center">🛍️ MerchantLink</h1>
 
-# 🛍️ MerchantLink
+<p align="center">
+  <img src="./banner.png" alt="MerchantLink Banner" width="100%">
+</p>
+
 
 **A seamless, blockchain-powered Point-of-Sale (POS) backend bridging real-world merchants with Solana-native consumers.**
 
