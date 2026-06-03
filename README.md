@@ -1,10 +1,10 @@
-<h1 align="center">🛍️ MerchantLink</h1>
 
+<h1 align="center">MerchantLink</h1>
 <p align="center">
   <img src="./banner.png" alt="MerchantLink Banner" width="100%">
 </p>
 
-
+<h2>🛍️ MerchantLink</h2>
 **A seamless, blockchain-powered Point-of-Sale (POS) backend bridging real-world merchants with Solana-native consumers.**
 
 Built natively on Solana using **Anchor 1.0.2** and the **Token-2022 Program**. MerchantLink empowers retail stores to effortlessly issue on-chain gift cards and soulbound loyalty points, while accepting real-world payments in USDC.
@@ -54,7 +54,6 @@ anchor build
 ```
 
 ## 🤝 The Team
-We are a team. Every line of code is written with the philosophy that clean, functional, and minimal design leads to the best developer and user experience. 
 
 ---
 *Built for the Solana Turbin3 Capstone.*
