@@ -53,7 +53,7 @@ To build the program locally:
 anchor build
 ```
 
-## 🤝 The Team
+
 
 ---
 *Built for the Solana Turbin3 Capstone.*
