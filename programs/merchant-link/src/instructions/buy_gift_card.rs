@@ -8,12 +8,19 @@ use anchor_spl::{
 };
 
 use crate::state::MerchantState;
+use crate::error::MerchantLinkError;
+use crate::constants::MERCHANT_SEED;
 
 /// Consumer pays USDC and receives a gift card + soulbound loyalty point.
 /// This maps to User Stories 1, 2, and 3 in one atomic transaction.
 pub fn handler(ctx: Context<BuyGiftCard>) -> Result<()> {
     let merchant_state = &ctx.accounts.merchant_state;
     let price = merchant_state.gift_card_price;
+
+    require!(
+        ctx.accounts.consumer_usdc_ata.amount >= price,
+        MerchantLinkError::InsufficientFunds
+    );
 
     // --- 1. Transfer USDC from consumer → merchant ---
     transfer_checked(
@@ -32,7 +39,7 @@ pub fn handler(ctx: Context<BuyGiftCard>) -> Result<()> {
 
     // --- 2. Mint 1 Gift Card token to consumer ---
     let seeds = &[
-        b"merchant",
+        MERCHANT_SEED,
         merchant_state.admin.as_ref(),
         &[merchant_state.bump],
     ];
@@ -85,7 +92,7 @@ pub struct BuyGiftCard<'info> {
     /// The merchant state PDA (mint authority for gift cards and loyalty points)
     #[account(
         mut,
-        seeds = [b"merchant", merchant_state.admin.as_ref()],
+        seeds = [MERCHANT_SEED, merchant_state.admin.as_ref()],
         bump = merchant_state.bump,
     )]
     pub merchant_state: Box<Account<'info, MerchantState>>,
@@ -93,6 +100,9 @@ pub struct BuyGiftCard<'info> {
     // --- USDC accounts ---
 
     /// USDC mint
+    #[account(
+        constraint = usdc_mint.key() == merchant_state.usdc_mint @ MerchantLinkError::InvalidUsdcMint,
+    )]
     pub usdc_mint: Box<InterfaceAccount<'info, Mint>>,
 
     /// Consumer's USDC token account (source of payment)

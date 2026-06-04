@@ -5,6 +5,8 @@ use anchor_lang::prelude::*;
 pub struct MerchantState {
     /// The merchant's admin wallet (signer for admin actions)
     pub admin: Pubkey,
+    /// The accepted USDC mint
+    pub usdc_mint: Pubkey,
     /// The merchant's USDC token account to receive payments
     pub usdc_token_account: Pubkey,
     /// The Token-2022 mint for gift cards

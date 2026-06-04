@@ -5,10 +5,17 @@ use anchor_spl::token_interface::{
 
 use crate::events::GiftCardRedeemed;
 use crate::state::MerchantState;
+use crate::error::MerchantLinkError;
+use crate::constants::MERCHANT_SEED;
 
 /// Consumer redeems their gift card in-store by burning the token.
 /// Emits a GiftCardRedeemed event for off-chain webhook notification.
 pub fn handler(ctx: Context<RedeemGiftCard>) -> Result<()> {
+    require!(
+        ctx.accounts.consumer_gift_card_ata.amount >= 1,
+        MerchantLinkError::NoGiftCardToRedeem
+    );
+
     // --- 1. Burn 1 Gift Card token from consumer's wallet ---
     burn(
         CpiContext::new(
@@ -31,6 +38,7 @@ pub fn handler(ctx: Context<RedeemGiftCard>) -> Result<()> {
     emit!(GiftCardRedeemed {
         merchant: merchant_state.admin,
         consumer: ctx.accounts.consumer.key(),
+        gift_card_mint: ctx.accounts.gift_card_mint.key(),
         timestamp: clock.unix_timestamp,
     });
 
@@ -50,7 +58,7 @@ pub struct RedeemGiftCard<'info> {
     /// The merchant state PDA
     #[account(
         mut,
-        seeds = [b"merchant", merchant_state.admin.as_ref()],
+        seeds = [MERCHANT_SEED, merchant_state.admin.as_ref()],
         bump = merchant_state.bump,
     )]
     pub merchant_state: Account<'info, MerchantState>,

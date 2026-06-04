@@ -6,5 +6,6 @@ use anchor_lang::prelude::*;
 pub struct GiftCardRedeemed {
     pub merchant: Pubkey,
     pub consumer: Pubkey,
+    pub gift_card_mint: Pubkey,
     pub timestamp: i64,
 }

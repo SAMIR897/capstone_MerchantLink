@@ -8,12 +8,11 @@ use anchor_spl::{
     },
 };
 
-use crate::state::MerchantState;
+use anchor_spl::token_2022::spl_token_2022::{extension::ExtensionType, state::Mint as TokenMint};
+use anchor_lang::solana_program::program_pack::Pack;
 
-/// Token-2022 Mint base size (same as legacy SPL Token Mint::LEN)
-const MINT_SIZE: usize = 82;
-/// NonTransferable extension adds: 1 (AccountType) + 2 (ExtensionType) + 2 (Length) + 0 (data)
-const NON_TRANSFERABLE_MINT_SIZE: usize = MINT_SIZE + 1 + 2 + 2;
+use crate::state::MerchantState;
+use crate::constants::MERCHANT_SEED;
 
 /// Initializes a new merchant profile with two Token-2022 mints:
 /// - A standard gift card mint
@@ -23,9 +22,10 @@ pub fn handler(
     gift_card_price: u64,
 ) -> Result<()> {
     let merchant_state_key = ctx.accounts.merchant_state.key();
+    let rent = Rent::get()?;
 
     // --- 1. Initialize the Gift Card Mint (standard Token-2022, no extensions) ---
-    let gift_card_lamports = Rent::get()?.minimum_balance(MINT_SIZE);
+    let gift_card_lamports = rent.minimum_balance(TokenMint::LEN);
 
     create_account(
         CpiContext::new(
@@ -36,13 +36,13 @@ pub fn handler(
             },
         ),
         gift_card_lamports,
-        MINT_SIZE as u64,
-        &ctx.accounts.token_program.key(),
+        TokenMint::LEN as u64,
+        &ctx.accounts.token_program_2022.key(),
     )?;
 
     initialize_mint2(
         CpiContext::new(
-            ctx.accounts.token_program.key(),
+            ctx.accounts.token_program_2022.to_account_info(),
             InitializeMint2 {
                 mint: ctx.accounts.gift_card_mint.to_account_info(),
             },
@@ -53,7 +53,10 @@ pub fn handler(
     )?;
 
     // --- 2. Initialize the Loyalty Mint (Token-2022 + NonTransferable) ---
-    let loyalty_lamports = Rent::get()?.minimum_balance(NON_TRANSFERABLE_MINT_SIZE);
+    let loyalty_size = ExtensionType::try_calculate_account_len::<TokenMint>(
+        &[ExtensionType::NonTransferable]
+    ).unwrap();
+    let loyalty_lamports = rent.minimum_balance(loyalty_size);
 
     create_account(
         CpiContext::new(
@@ -64,24 +67,24 @@ pub fn handler(
             },
         ),
         loyalty_lamports,
-        NON_TRANSFERABLE_MINT_SIZE as u64,
-        &ctx.accounts.token_program.key(),
+        loyalty_size as u64,
+        &ctx.accounts.token_program_2022.key(),
     )?;
 
     // IMPORTANT: Initialize the NonTransferable extension BEFORE initialize_mint2
     non_transferable_mint_initialize(
         CpiContext::new(
-            ctx.accounts.token_program.key(),
+            ctx.accounts.token_program_2022.to_account_info(),
             anchor_spl::token_2022_extensions::NonTransferableMintInitialize {
                 mint: ctx.accounts.loyalty_mint.to_account_info(),
-                token_program_id: ctx.accounts.token_program.to_account_info(),
+                token_program_id: ctx.accounts.token_program_2022.to_account_info(),
             },
         ),
     )?;
 
     initialize_mint2(
         CpiContext::new(
-            ctx.accounts.token_program.key(),
+            ctx.accounts.token_program_2022.to_account_info(),
             InitializeMint2 {
                 mint: ctx.accounts.loyalty_mint.to_account_info(),
             },
@@ -94,6 +97,7 @@ pub fn handler(
     // --- 3. Populate the MerchantState PDA ---
     let merchant_state = &mut ctx.accounts.merchant_state;
     merchant_state.admin = ctx.accounts.merchant_admin.key();
+    merchant_state.usdc_mint = ctx.accounts.usdc_mint.key();
     merchant_state.usdc_token_account = ctx.accounts.merchant_usdc_ata.key();
     merchant_state.gift_card_mint = ctx.accounts.gift_card_mint.key();
     merchant_state.loyalty_mint = ctx.accounts.loyalty_mint.key();
@@ -120,7 +124,7 @@ pub struct InitializeMerchant<'info> {
         init,
         payer = merchant_admin,
         space = 8 + MerchantState::INIT_SPACE,
-        seeds = [b"merchant", merchant_admin.key().as_ref()],
+        seeds = [MERCHANT_SEED, merchant_admin.key().as_ref()],
         bump,
     )]
     pub merchant_state: Box<Account<'info, MerchantState>>,
@@ -143,10 +147,14 @@ pub struct InitializeMerchant<'info> {
     #[account(
         associated_token::mint = usdc_mint,
         associated_token::authority = merchant_admin,
+        associated_token::token_program = token_program,
     )]
     pub merchant_usdc_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     /// Token-2022 program (for gift card and loyalty mints)
+    pub token_program_2022: Interface<'info, TokenInterface>,
+
+    /// Token program (for USDC)
     pub token_program: Interface<'info, TokenInterface>,
 
     /// Associated Token Program
