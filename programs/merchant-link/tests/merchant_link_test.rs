@@ -13,9 +13,10 @@ use anchor_lang::solana_program::{
 use solana_signer::Signer;
 use solana_transaction::Transaction;
 use anchor_lang::{InstructionData, ToAccountMetas};
+use spl_token_2022::extension::StateWithExtensionsOwned;
 
 #[test]
-fn test_merchant_link_flow() {
+fn test_merchant_link_full_flow() {
     let mut svm = LiteSVM::new();
     let merchant_link_program_id = merchant_link::ID;
 
@@ -33,11 +34,12 @@ fn test_merchant_link_flow() {
     svm.airdrop(&admin.pubkey(), 10_000_000_000).unwrap();
     svm.airdrop(&consumer.pubkey(), 10_000_000_000).unwrap();
 
-    // 1. Setup mock USDC
+    // ═══════════════════════════════════════════════════
+    //  STEP 1: Setup mock USDC mint
+    // ═══════════════════════════════════════════════════
     let usdc_mint = Keypair::new();
     let token_program = spl_token::ID;
     
-    // Create USDC mint
     let rent = Rent::default();
     let mint_len = spl_token::state::Mint::LEN;
     let create_mint_ix = system_instruction::create_account(
@@ -65,7 +67,9 @@ fn test_merchant_link_flow() {
     );
     svm.send_transaction(tx).unwrap();
 
-    // 2. Setup ATAs and mint USDC to consumer
+    // ═══════════════════════════════════════════════════
+    //  STEP 2: Setup ATAs and mint USDC to consumer
+    // ═══════════════════════════════════════════════════
     let merchant_usdc_ata = get_associated_token_address(&admin.pubkey(), &usdc_mint.pubkey());
     let consumer_usdc_ata = get_associated_token_address(&consumer.pubkey(), &usdc_mint.pubkey());
 
@@ -104,8 +108,10 @@ fn test_merchant_link_flow() {
     );
     svm.send_transaction(tx).unwrap();
 
-    // 3. Initialize Merchant
-    let (merchant_state_pda, bump) =
+    // ═══════════════════════════════════════════════════
+    //  STEP 3: Initialize Merchant
+    // ═══════════════════════════════════════════════════
+    let (merchant_state_pda, _bump) =
         Pubkey::find_program_address(&[MERCHANT_SEED, admin.pubkey().as_ref()], &merchant_link_program_id);
 
     let gift_card_mint = Keypair::new();
@@ -143,11 +149,14 @@ fn test_merchant_link_flow() {
     );
     svm.send_transaction(tx).expect("Initialize Merchant Failed");
 
-    // Verify State
+    // Verify merchant state was created
     let state_account = svm.get_account(&merchant_state_pda).unwrap();
     assert_eq!(state_account.owner, merchant_link_program_id);
+    println!("✅ Merchant initialized successfully!");
 
-    // 4. Buy Gift Card
+    // ═══════════════════════════════════════════════════
+    //  STEP 4: Buy Gift Card
+    // ═══════════════════════════════════════════════════
     let consumer_gift_card_ata = get_associated_token_address_with_program_id(
         &consumer.pubkey(),
         &gift_card_mint.pubkey(),
@@ -201,13 +210,93 @@ fn test_merchant_link_flow() {
     let merchant_usdc_state = spl_token::state::Account::unpack(&merchant_usdc_account.data).unwrap();
     assert_eq!(merchant_usdc_state.amount, 5_000_000);
 
-    // Verify Consumer received 1 Gift Card token
+    // Verify Consumer received 1 Gift Card token (Token-2022 — use StateWithExtensions)
     let consumer_gc_account = svm.get_account(&consumer_gift_card_ata).unwrap();
-    let consumer_gc_state = spl_token_2022::state::Account::unpack(&consumer_gc_account.data).unwrap();
-    assert_eq!(consumer_gc_state.amount, 1);
+    let consumer_gc_state = StateWithExtensionsOwned::<spl_token_2022::state::Account>::unpack(
+        consumer_gc_account.data.clone(),
+    ).unwrap();
+    assert_eq!(consumer_gc_state.base.amount, 1);
 
-    // Verify Consumer received 1 Loyalty token
+    // Verify Consumer received 1 Loyalty token (Token-2022 + NonTransferable)
     let consumer_loyalty_account = svm.get_account(&consumer_loyalty_ata).unwrap();
-    let consumer_loyalty_state = spl_token_2022::state::Account::unpack(&consumer_loyalty_account.data).unwrap();
-    assert_eq!(consumer_loyalty_state.amount, 1);
+    let consumer_loyalty_state = StateWithExtensionsOwned::<spl_token_2022::state::Account>::unpack(
+        consumer_loyalty_account.data.clone(),
+    ).unwrap();
+    assert_eq!(consumer_loyalty_state.base.amount, 1);
+
+    println!("✅ Gift card purchased! Consumer has 1 gift card + 1 loyalty point.");
+
+    // ═══════════════════════════════════════════════════
+    //  STEP 5: Redeem Gift Card
+    // ═══════════════════════════════════════════════════
+    let redeem_accounts = merchant_link::accounts::RedeemGiftCard {
+        consumer: consumer.pubkey(),
+        merchant_state: merchant_state_pda,
+        gift_card_mint: gift_card_mint.pubkey(),
+        consumer_gift_card_ata,
+        token_program_2022,
+    };
+
+    let redeem_data = merchant_link::instruction::RedeemGiftCard {};
+    let redeem_ix = Instruction {
+        program_id: merchant_link_program_id,
+        accounts: redeem_accounts.to_account_metas(Some(true)),
+        data: redeem_data.data(),
+    };
+
+    let blockhash = svm.latest_blockhash();
+    let tx = Transaction::new_signed_with_payer(
+        &[redeem_ix],
+        Some(&consumer.pubkey()),
+        &[&consumer],
+        blockhash,
+    );
+    svm.send_transaction(tx).expect("Redeem Gift Card Failed");
+
+    // Verify gift card was burned (balance should be 0)
+    let consumer_gc_account_after = svm.get_account(&consumer_gift_card_ata).unwrap();
+    let consumer_gc_state_after = StateWithExtensionsOwned::<spl_token_2022::state::Account>::unpack(
+        consumer_gc_account_after.data.clone(),
+    ).unwrap();
+    assert_eq!(consumer_gc_state_after.base.amount, 0);
+
+    // Verify loyalty point is still there (soulbound, never burned)
+    let consumer_loyalty_after = svm.get_account(&consumer_loyalty_ata).unwrap();
+    let consumer_loyalty_state_after = StateWithExtensionsOwned::<spl_token_2022::state::Account>::unpack(
+        consumer_loyalty_after.data.clone(),
+    ).unwrap();
+    assert_eq!(consumer_loyalty_state_after.base.amount, 1);
+
+    println!("✅ Gift card redeemed! Balance is 0, loyalty point remains.");
+
+    // ═══════════════════════════════════════════════════
+    //  STEP 6: Verify double-redeem fails
+    // ═══════════════════════════════════════════════════
+    let redeem_accounts_2 = merchant_link::accounts::RedeemGiftCard {
+        consumer: consumer.pubkey(),
+        merchant_state: merchant_state_pda,
+        gift_card_mint: gift_card_mint.pubkey(),
+        consumer_gift_card_ata,
+        token_program_2022,
+    };
+
+    let redeem_data_2 = merchant_link::instruction::RedeemGiftCard {};
+    let redeem_ix_2 = Instruction {
+        program_id: merchant_link_program_id,
+        accounts: redeem_accounts_2.to_account_metas(Some(true)),
+        data: redeem_data_2.data(),
+    };
+
+    let blockhash = svm.latest_blockhash();
+    let tx = Transaction::new_signed_with_payer(
+        &[redeem_ix_2],
+        Some(&consumer.pubkey()),
+        &[&consumer],
+        blockhash,
+    );
+    let result = svm.send_transaction(tx);
+    assert!(result.is_err(), "Double redeem should have failed!");
+
+    println!("✅ Double-redeem correctly rejected!");
+    println!("🎉 All MerchantLink tests passed!");
 }
