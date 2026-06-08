@@ -42,7 +42,7 @@ pub fn handler(
 
     initialize_mint2(
         CpiContext::new(
-            ctx.accounts.token_program_2022.to_account_info(),
+            ctx.accounts.token_program_2022.key(),
             InitializeMint2 {
                 mint: ctx.accounts.gift_card_mint.to_account_info(),
             },
@@ -74,7 +74,7 @@ pub fn handler(
     // IMPORTANT: Initialize the NonTransferable extension BEFORE initialize_mint2
     non_transferable_mint_initialize(
         CpiContext::new(
-            ctx.accounts.token_program_2022.to_account_info(),
+            ctx.accounts.token_program_2022.key(),
             anchor_spl::token_2022_extensions::NonTransferableMintInitialize {
                 mint: ctx.accounts.loyalty_mint.to_account_info(),
                 token_program_id: ctx.accounts.token_program_2022.to_account_info(),
@@ -84,7 +84,7 @@ pub fn handler(
 
     initialize_mint2(
         CpiContext::new(
-            ctx.accounts.token_program_2022.to_account_info(),
+            ctx.accounts.token_program_2022.key(),
             InitializeMint2 {
                 mint: ctx.accounts.loyalty_mint.to_account_info(),
             },
