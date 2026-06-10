@@ -1,0 +1,756 @@
+{
+  "address": "Do2bnhgFrAxQbGB4woahzBKyQZm4efHaDnk2FQzSVsJh",
+  "metadata": {
+    "name": "merchant_link",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "MerchantLink - Zero-fee POS and loyalty platform on Solana"
+  },
+  "instructions": [
+    {
+      "name": "buy_gift_card",
+      "docs": [
+        "Consumer purchases a gift card with USDC and receives a loyalty point"
+      ],
+      "discriminator": [
+        153,
+        99,
+        12,
+        161,
+        241,
+        137,
+        109,
+        211
+      ],
+      "accounts": [
+        {
+          "name": "consumer",
+          "docs": [
+            "The consumer buying the gift card"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "merchant_state",
+          "docs": [
+            "The merchant state PDA (mint authority for gift cards and loyalty points)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  114,
+                  99,
+                  104,
+                  97,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "merchant_state.admin",
+                "account": "MerchantState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "usdc_mint",
+          "docs": [
+            "USDC mint"
+          ]
+        },
+        {
+          "name": "consumer_usdc_ata",
+          "docs": [
+            "Consumer's USDC token account (source of payment)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "consumer"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "usdc_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "merchant_usdc_ata",
+          "docs": [
+            "Merchant's USDC token account (destination of payment)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "gift_card_mint",
+          "docs": [
+            "Gift card mint (Token-2022)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "consumer_gift_card_ata",
+          "docs": [
+            "Consumer's gift card token account — created if it doesn't exist"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "consumer"
+              },
+              {
+                "kind": "account",
+                "path": "token_program_2022"
+              },
+              {
+                "kind": "account",
+                "path": "gift_card_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "loyalty_mint",
+          "docs": [
+            "Loyalty point mint (Token-2022, NonTransferable)"
+          ],
+          "writable": true
+        },
+        {
+          "name": "consumer_loyalty_ata",
+          "docs": [
+            "Consumer's loyalty point token account — created if it doesn't exist"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "consumer"
+              },
+              {
+                "kind": "account",
+                "path": "token_program_2022"
+              },
+              {
+                "kind": "account",
+                "path": "loyalty_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "docs": [
+            "Token program for USDC transfers"
+          ]
+        },
+        {
+          "name": "token_program_2022",
+          "docs": [
+            "Token-2022 program for gift card + loyalty minting"
+          ]
+        },
+        {
+          "name": "associated_token_program",
+          "docs": [
+            "Associated Token Program"
+          ],
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "docs": [
+            "System Program"
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_merchant",
+      "docs": [
+        "Initialize a new merchant profile with gift card and loyalty mints"
+      ],
+      "discriminator": [
+        7,
+        90,
+        74,
+        38,
+        99,
+        111,
+        142,
+        77
+      ],
+      "accounts": [
+        {
+          "name": "merchant_admin",
+          "docs": [
+            "The merchant admin wallet — pays for account creation"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "merchant_state",
+          "docs": [
+            "The merchant state PDA — stores all merchant config"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  114,
+                  99,
+                  104,
+                  97,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "merchant_admin"
+              }
+            ]
+          }
+        },
+        {
+          "name": "gift_card_mint",
+          "docs": [
+            "The gift card mint (Token-2022). New keypair, created in handler."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "loyalty_mint",
+          "docs": [
+            "The loyalty point mint (Token-2022 + NonTransferable). New keypair, created in handler."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "usdc_mint",
+          "docs": [
+            "The USDC mint (used for validation only)"
+          ]
+        },
+        {
+          "name": "merchant_usdc_ata",
+          "docs": [
+            "The merchant's USDC Associated Token Account to receive payments"
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "merchant_admin"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "usdc_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program_2022",
+          "docs": [
+            "Token-2022 program (for gift card and loyalty mints)"
+          ]
+        },
+        {
+          "name": "token_program",
+          "docs": [
+            "Token program (for USDC)"
+          ]
+        },
+        {
+          "name": "associated_token_program",
+          "docs": [
+            "Associated Token Program"
+          ],
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "docs": [
+            "System Program"
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "gift_card_price",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "redeem_gift_card",
+      "docs": [
+        "Consumer redeems a gift card in-store (burns token, emits event)"
+      ],
+      "discriminator": [
+        213,
+        90,
+        9,
+        183,
+        232,
+        155,
+        243,
+        102
+      ],
+      "accounts": [
+        {
+          "name": "consumer",
+          "docs": [
+            "The consumer redeeming the gift card"
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "merchant_state",
+          "docs": [
+            "The merchant state PDA"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  101,
+                  114,
+                  99,
+                  104,
+                  97,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "merchant_state.admin",
+                "account": "MerchantState"
+              }
+            ]
+          }
+        },
+        {
+          "name": "gift_card_mint",
+          "docs": [
+            "Gift card mint (Token-2022) — supply decreases on burn"
+          ],
+          "writable": true
+        },
+        {
+          "name": "consumer_gift_card_ata",
+          "docs": [
+            "Consumer's gift card token account (being burned from)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "consumer"
+              },
+              {
+                "kind": "account",
+                "path": "token_program_2022"
+              },
+              {
+                "kind": "account",
+                "path": "gift_card_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program_2022",
+          "docs": [
+            "Token-2022 program"
+          ]
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "MerchantState",
+      "discriminator": [
+        122,
+        123,
+        114,
+        132,
+        232,
+        201,
+        233,
+        199
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "GiftCardRedeemed",
+      "discriminator": [
+        159,
+        33,
+        34,
+        241,
+        121,
+        81,
+        211,
+        110
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient USDC balance to purchase gift card."
+    },
+    {
+      "code": 6001,
+      "name": "NoGiftCardToRedeem",
+      "msg": "No gift card tokens to redeem."
+    },
+    {
+      "code": 6002,
+      "name": "InvalidUsdcMint",
+      "msg": "Invalid USDC mint address."
+    },
+    {
+      "code": 6003,
+      "name": "Unauthorized",
+      "msg": "Unauthorized: only the merchant admin can perform this action."
+    }
+  ],
+  "types": [
+    {
+      "name": "GiftCardRedeemed",
+      "docs": [
+        "Emitted when a consumer redeems a gift card in-store.",
+        "Off-chain webhooks listen for this event to notify the merchant's POS tablet."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "merchant",
+            "type": "pubkey"
+          },
+          {
+            "name": "consumer",
+            "type": "pubkey"
+          },
+          {
+            "name": "gift_card_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MerchantState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "docs": [
+              "The merchant's admin wallet (signer for admin actions)"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "usdc_mint",
+            "docs": [
+              "The accepted USDC mint"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "usdc_token_account",
+            "docs": [
+              "The merchant's USDC token account to receive payments"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "gift_card_mint",
+            "docs": [
+              "The Token-2022 mint for gift cards"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "loyalty_mint",
+            "docs": [
+              "The Token-2022 mint for loyalty points (NonTransferable)"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "gift_card_price",
+            "docs": [
+              "Price of a gift card in USDC (6 decimals, e.g. 5_000_000 = $5)"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "cards_sold",
+            "docs": [
+              "Total gift cards sold"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "cards_redeemed",
+            "docs": [
+              "Total gift cards redeemed"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump seed"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "MERCHANT_SEED",
+      "type": "bytes",
+      "value": "[109, 101, 114, 99, 104, 97, 110, 116]"
+    }
+  ]
+}
