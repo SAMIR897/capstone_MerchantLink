@@ -11,14 +11,12 @@ use merchant_link::{
         BuyGiftCard as BuyGiftCardIx, InitializeMerchant as InitializeMerchantIx,
         RedeemGiftCard as RedeemGiftCardIx,
     },
-    state::MerchantState,
     MERCHANT_SEED,
 };
 use solana_keypair::Keypair;
 use solana_message::Message;
 use solana_signer::Signer;
 use solana_transaction::Transaction;
-use std::env;
 use std::fs;
 use anchor_lang::solana_program::program_pack::Pack;
 
@@ -37,7 +35,7 @@ fn test_merchant_link_flow() {
     
     // Add the program to LiteSVM
     let program_bytes = read_program_bytes();
-    svm.add_program(program_id, &program_bytes);
+    svm.add_program(program_id, &program_bytes).unwrap();
 
     // Keypairs
     let merchant_admin = Keypair::new();
@@ -80,7 +78,7 @@ fn test_merchant_link_flow() {
     svm.send_transaction(tx).unwrap();
 
     // 1. Initialize Merchant
-    let (merchant_state_pda, bump) =
+    let (merchant_state_pda, _bump) =
         solana_program::pubkey::Pubkey::find_program_address(
             &[MERCHANT_SEED, merchant_admin.pubkey().as_ref()],
             &program_id,
@@ -135,7 +133,7 @@ fn test_merchant_link_flow() {
     svm.send_transaction(tx).unwrap();
 
     // Verify state
-    let state_account = svm.get_account(&merchant_state_pda).unwrap();
+    let _state_account = svm.get_account(&merchant_state_pda).unwrap();
     // Assuming works if no error
 
     // 2. Setup Consumer USDC
