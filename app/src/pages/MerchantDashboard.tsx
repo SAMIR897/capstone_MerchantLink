@@ -236,13 +236,13 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
                     <button 
                         onClick={() => { setActionType('buy'); setSuccessMsg(''); }}
-                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'buy' ? 'var(--primary)' : 'var(--border)'}`, background: actionType === 'buy' ? 'var(--primary-dim)' : 'transparent', color: actionType === 'buy' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'buy' ? 'var(--primary)' : 'var(--border)'}`, background: actionType === 'buy' ? 'var(--primary-dim)' : 'transparent', color: actionType === 'buy' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
                     >
                         Buy Giftcard
                     </button>
                     <button 
                         onClick={() => { setActionType('issue'); setSuccessMsg(''); }}
-                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'issue' ? 'var(--secondary)' : 'var(--border)'}`, background: actionType === 'issue' ? 'rgba(0,229,255,0.1)' : 'transparent', color: actionType === 'issue' ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'issue' ? 'var(--secondary)' : 'var(--border)'}`, background: actionType === 'issue' ? 'rgba(0,229,255,0.1)' : 'transparent', color: actionType === 'issue' ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
                     >
                         Issue a Gift Card
                     </button>
@@ -251,18 +251,18 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                 {/* BUY FLOW */}
                 {actionType === 'buy' && (
                     <div className="animate-slide-up">
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '16px' }}>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '12px', lineHeight: 1.5 }}>
                             Purchase a new gift card for yourself. Choose the source below.
                         </p>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '12px', border: '1px solid var(--border)', borderRadius: '12px', background: buySource === 'platform' ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.2s' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', border: '1px solid var(--border)', borderRadius: '10px', background: buySource === 'platform' ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.2s' }}>
                                 <input type="radio" checked={buySource === 'platform'} onChange={() => setBuySource('platform')} style={{ accentColor: 'var(--primary)' }} />
-                                <span style={{ color: 'var(--text-main)', fontWeight: 500, fontSize: '0.85rem' }}>Buy from The Platform</span>
+                                <span style={{ color: 'var(--text-main)', fontWeight: 400, fontSize: '0.8rem' }}>Buy from The Platform</span>
                             </label>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '12px', border: '1px solid var(--border)', borderRadius: '12px', background: buySource === 'merchant' ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.2s' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', border: '1px solid var(--border)', borderRadius: '10px', background: buySource === 'merchant' ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.2s' }}>
                                 <input type="radio" checked={buySource === 'merchant'} onChange={() => setBuySource('merchant')} style={{ accentColor: 'var(--primary)' }} />
-                                <span style={{ color: 'var(--text-main)', fontWeight: 500, fontSize: '0.85rem' }}>Buy from Any Merchant</span>
+                                <span style={{ color: 'var(--text-main)', fontWeight: 400, fontSize: '0.8rem' }}>Buy from Any Merchant</span>
                             </label>
                         </div>
 
@@ -307,7 +307,7 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
 
                         <button 
                             className={`btn ${(!wallet.connected && false) ? 'btn-disabled' : 'btn-primary'}`} 
-                            style={{ width: '100%', height: '50px', fontSize: '1rem', marginTop: '4px' }}
+                            style={{ width: '100%', height: '44px', fontSize: '0.85rem', marginTop: '4px' }}
                             onClick={handleTransaction}
                             disabled={isLoading || !inputAmount}
                         >
@@ -340,7 +340,7 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                         {!isVerified && (
                             <button 
                                 className="btn" 
-                                style={{ width: '100%', height: '44px', background: 'var(--bg-card-elevated)', border: '1px solid var(--border)', color: 'var(--text-main)' }}
+                                style={{ width: '100%', height: '38px', background: 'var(--bg-card-elevated)', border: '1px solid var(--border)', color: 'var(--text-main)', fontSize: '0.8rem' }}
                                 onClick={verifyUser}
                                 disabled={!issueAddress || isLoading}
                             >
@@ -358,28 +358,28 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                                     </div>
                                 </div>
 
-                                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '12px' }}>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '8px', lineHeight: 1.5 }}>
                                     Where would you like to issue the gift card from?
                                 </p>
 
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '8px 0' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '6px 0' }}>
                                         <input type="radio" checked={issueSource === 'collection'} onChange={() => setIssueSource('collection')} style={{ accentColor: 'var(--secondary)' }} />
-                                        <span style={{ color: 'var(--text-main)', fontSize: '0.85rem' }}>From my Collection</span>
+                                        <span style={{ color: 'var(--text-main)', fontSize: '0.8rem' }}>From my Collection</span>
                                     </label>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '8px 0' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '6px 0' }}>
                                         <input type="radio" checked={issueSource === 'buy_platform'} onChange={() => setIssueSource('buy_platform')} style={{ accentColor: 'var(--secondary)' }} />
-                                        <span style={{ color: 'var(--text-main)', fontSize: '0.85rem' }}>Buy from The Platform</span>
+                                        <span style={{ color: 'var(--text-main)', fontSize: '0.8rem' }}>Buy from The Platform</span>
                                     </label>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '8px 0' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '6px 0' }}>
                                         <input type="radio" checked={issueSource === 'buy_merchant'} onChange={() => setIssueSource('buy_merchant')} style={{ accentColor: 'var(--secondary)' }} />
-                                        <span style={{ color: 'var(--text-main)', fontSize: '0.85rem' }}>Buy from Any Merchant</span>
+                                        <span style={{ color: 'var(--text-main)', fontSize: '0.8rem' }}>Buy from Any Merchant</span>
                                     </label>
                                 </div>
 
                                 {issueSource === 'buy_merchant' && (
                                     <div className="form-group animate-slide-up" style={{ marginBottom: '20px', padding: '16px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                                        <label className="input-label" style={{ fontSize: '0.85rem' }}>Merchant Address</label>
+                                        <label className="input-label" style={{ fontSize: '0.75rem' }}>Merchant Address</label>
                                         <div className="input-group">
                                             <Store className="input-icon" size={16} />
                                             <input 
@@ -395,7 +395,7 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
 
                                 <button 
                                     className={`btn ${!wallet.connected ? 'btn-disabled' : 'btn-primary'}`} 
-                                    style={{ width: '100%', height: '50px', fontSize: '1rem', background: 'linear-gradient(135deg, var(--secondary), #00b0ff)' }}
+                                    style={{ width: '100%', height: '44px', fontSize: '0.85rem', background: 'linear-gradient(135deg, var(--secondary), #00b0ff)' }}
                                     onClick={handleTransaction}
                                     disabled={!wallet.connected || isLoading || (issueSource === 'buy_merchant' && !issueMerchantAddress)}
                                 >
