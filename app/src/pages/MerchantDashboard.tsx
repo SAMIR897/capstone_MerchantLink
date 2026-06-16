@@ -186,11 +186,11 @@ export const MerchantDashboard: FC = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
                             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '12px', border: '1px solid var(--border)', borderRadius: '12px', background: buySource === 'platform' ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.2s' }}>
                                 <input type="radio" checked={buySource === 'platform'} onChange={() => setBuySource('platform')} style={{ accentColor: 'var(--primary)' }} />
-                                <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>Buy from The Platform</span>
+                                <span style={{ color: 'var(--text-main)', fontWeight: 500, fontSize: '0.85rem' }}>Buy from The Platform</span>
                             </label>
                             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '12px', border: '1px solid var(--border)', borderRadius: '12px', background: buySource === 'merchant' ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.2s' }}>
                                 <input type="radio" checked={buySource === 'merchant'} onChange={() => setBuySource('merchant')} style={{ accentColor: 'var(--primary)' }} />
-                                <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>Buy from Any Merchant</span>
+                                <span style={{ color: 'var(--text-main)', fontWeight: 500, fontSize: '0.85rem' }}>Buy from Any Merchant</span>
                             </label>
                         </div>
 
@@ -270,15 +270,15 @@ export const MerchantDashboard: FC = () => {
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
                                     <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '8px 0' }}>
                                         <input type="radio" checked={issueSource === 'collection'} onChange={() => setIssueSource('collection')} style={{ accentColor: 'var(--secondary)' }} />
-                                        <span style={{ color: 'var(--text-main)', fontSize: '0.95rem' }}>From my Collection</span>
+                                        <span style={{ color: 'var(--text-main)', fontSize: '0.85rem' }}>From my Collection</span>
                                     </label>
                                     <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '8px 0' }}>
                                         <input type="radio" checked={issueSource === 'buy_platform'} onChange={() => setIssueSource('buy_platform')} style={{ accentColor: 'var(--secondary)' }} />
-                                        <span style={{ color: 'var(--text-main)', fontSize: '0.95rem' }}>Buy from The Platform</span>
+                                        <span style={{ color: 'var(--text-main)', fontSize: '0.85rem' }}>Buy from The Platform</span>
                                     </label>
                                     <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '8px 0' }}>
                                         <input type="radio" checked={issueSource === 'buy_merchant'} onChange={() => setIssueSource('buy_merchant')} style={{ accentColor: 'var(--secondary)' }} />
-                                        <span style={{ color: 'var(--text-main)', fontSize: '0.95rem' }}>Buy from Any Merchant</span>
+                                        <span style={{ color: 'var(--text-main)', fontSize: '0.85rem' }}>Buy from Any Merchant</span>
                                     </label>
                                 </div>
 
