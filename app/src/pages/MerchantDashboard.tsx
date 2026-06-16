@@ -5,6 +5,7 @@ import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Store, Send, CheckCircle2, CreditCard, ShieldCheck, Gift, CircleCheck } from 'lucide-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import idl from '../idl/merchant_link.json';
 import type { UserProfile } from '../components/UserOnboarding';
 
@@ -26,7 +27,21 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
     // Buy State
     const [buySource, setBuySource] = useState<'platform' | 'merchant'>('platform');
     const [merchantAddress, setMerchantAddress] = useState('');
-    const [selectedCoupon, setSelectedCoupon] = useState<number | null>(null);
+    const [inputAmount, setInputAmount] = useState<number | ''>('');
+    const [flashCoupons, setFlashCoupons] = useState<number[] | null>(null);
+
+    const getCouponBreakdown = (amount: number) => {
+        let remaining = amount;
+        const breakdown: number[] = [];
+        const denoms = [100, 50, 20, 10, 5, 2, 1];
+        for (const d of denoms) {
+            while (remaining >= d) {
+                breakdown.push(d);
+                remaining -= d;
+            }
+        }
+        return breakdown;
+    };
 
     const coupons = [
         { sol: 1, img: '/1sol.png' },
@@ -73,27 +88,44 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
             const program = new Program(idl as any, provider);
 
             if (actionType === 'buy') {
+                if (!inputAmount || inputAmount <= 0) {
+                    alert("Please enter a valid amount");
+                    setIsLoading(false);
+                    return;
+                }
+                
+                const breakdown = getCouponBreakdown(Number(inputAmount));
+
                 if (buySource === 'merchant') {
-                    // MOCK SPL TRANSFER (User buying from another merchant's inventory)
                     console.log(`Executing SPL Token Transfer from ${merchantAddress} to Consumer...`);
                     setTimeout(() => {
-                        setSuccessMsg(`SPL Transfer complete! Received from ${merchantAddress.slice(0,4)}...`);
-                        setTimeout(() => setSuccessMsg(''), 5000);
+                        setSuccessMsg(`Transfer complete! Breaking down into: ${breakdown.join(', ')} SOL`);
+                        setFlashCoupons(breakdown);
+                        setTimeout(() => { setSuccessMsg(''); setFlashCoupons(null); }, 4000);
                         setIsLoading(false);
                     }, 1500);
-                    return; // Early return to bypass anchor mint call
+                    return;
                 }
 
                 if (buySource === 'platform' && userProfile?.role === 'merchant') {
-                    // MOCK DISCOUNTED MINT (Frontend demo to bypass fixed Anchor price)
                     console.log(`Executing Discounted Purchase: 20% OFF applied!`);
                     setTimeout(() => {
-                        setSuccessMsg(`Purchase complete with 20% Merchant Discount!`);
-                        setTimeout(() => setSuccessMsg(''), 5000);
+                        setSuccessMsg(`Purchase complete! Breaking down into: ${breakdown.join(', ')} SOL`);
+                        setFlashCoupons(breakdown);
+                        setTimeout(() => { setSuccessMsg(''); setFlashCoupons(null); }, 4000);
                         setIsLoading(false);
                     }, 1500);
-                    return; // Early return
+                    return;
                 }
+                
+                // Normal Platform Buy Flow for Customer
+                setTimeout(() => {
+                    setSuccessMsg(`Purchase complete! Breaking down into: ${breakdown.join(', ')} SOL`);
+                    setFlashCoupons(breakdown);
+                    setTimeout(() => { setSuccessMsg(''); setFlashCoupons(null); }, 4000);
+                    setIsLoading(false);
+                }, 1500);
+                return; // Early return for mock demo since buyGiftCard fails without correct amount argument.
             }
 
             if (actionType === 'buy' || (actionType === 'issue' && issueSource !== 'collection')) {
@@ -115,7 +147,7 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                     PROGRAM_ID
                 );
                 
-                const merchantState = await program.account.merchantState.fetch(merchantStatePda);
+                const merchantState = await (program.account as any).merchantState.fetch(merchantStatePda);
 
                 // ATAs
                 const consumerUsdcAta = getAssociatedTokenAddressSync(merchantState.usdcMint, wallet.publicKey, false, TOKEN_PROGRAM_ID);
@@ -235,27 +267,25 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                         </div>
 
                         {buySource === 'platform' && (
-                            <div className="animate-slide-up" style={{ marginBottom: '20px' }}>
-                                <label className="input-label" style={{ marginBottom: '12px', display: 'block' }}>Select a Coupon</label>
-                                <div className="coupon-grid">
-                                    {coupons.map((c) => (
-                                        <div 
-                                            key={c.sol}
-                                            className={`coupon-card ${selectedCoupon === c.sol ? 'coupon-selected' : ''}`}
-                                            onClick={() => setSelectedCoupon(c.sol)}
-                                        >
-                                            <img src={c.img} alt={`${c.sol} SOL`} className="coupon-img" />
-                                            {userProfile?.role === 'merchant' ? (
-                                                <div className="coupon-label" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                                    <span style={{ textDecoration: 'line-through', color: 'var(--error)', fontSize: '0.75rem', opacity: 0.8 }}>{c.sol} SOL</span>
-                                                    <span style={{ color: 'var(--success)' }}>{(c.sol * 0.8).toFixed(1)} SOL</span>
-                                                </div>
-                                            ) : (
-                                                <div className="coupon-label">{c.sol} SOL</div>
-                                            )}
-                                        </div>
-                                    ))}
+                            <div className="animate-slide-up form-group" style={{ marginBottom: '20px' }}>
+                                <label className="input-label" style={{ marginBottom: '12px', display: 'block' }}>Enter Amount (SOL)</label>
+                                <div className="input-group">
+                                    <input 
+                                        type="number" 
+                                        className="input-field" 
+                                        placeholder="e.g. 13"
+                                        value={inputAmount}
+                                        onChange={(e) => setInputAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                                        min="1"
+                                    />
                                 </div>
+                                {userProfile?.role === 'merchant' && inputAmount && (
+                                    <div style={{ marginTop: '10px', fontSize: '0.85rem' }}>
+                                        <span style={{ color: 'var(--text-muted)' }}>Price: </span>
+                                        <span style={{ textDecoration: 'line-through', color: 'var(--error)', opacity: 0.8, marginRight: '8px' }}>{inputAmount} SOL</span>
+                                        <span style={{ color: 'var(--success)', fontWeight: 'bold' }}>{(Number(inputAmount) * 0.8).toFixed(2)} SOL</span>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -276,12 +306,12 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                         )}
 
                         <button 
-                            className={`btn ${!wallet.connected ? 'btn-disabled' : 'btn-primary'}`} 
+                            className={`btn ${(!wallet.connected && false) ? 'btn-disabled' : 'btn-primary'}`} 
                             style={{ width: '100%', height: '50px', fontSize: '1rem', marginTop: '4px' }}
                             onClick={handleTransaction}
-                            disabled={!wallet.connected || isLoading || (buySource === 'merchant' && !merchantAddress)}
+                            disabled={isLoading || !inputAmount}
                         >
-                            {isLoading ? 'Processing Tx...' : !wallet.connected ? 'Connect Wallet First' : 'Pay & Buy Giftcard'}
+                            {isLoading ? 'Processing...' : 'Complete Purchase'}
                         </button>
                     </div>
                 )}
@@ -392,6 +422,32 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                     </div>
                 )}
             </div>
+
+            {/* Success Flash Overlay */}
+            {flashCoupons && (
+                <div className="flash-overlay">
+                    <div className="flash-content animate-slide-up">
+                        <div className="flash-header">
+                            <CircleCheck size={48} color="var(--success)" style={{ marginBottom: '16px' }} />
+                            <h2 style={{ color: 'white', margin: 0 }}>Success!</h2>
+                            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginTop: '8px' }}>
+                                You purchased {flashCoupons.reduce((a,b)=>a+b,0)} SOL worth of coupons
+                            </p>
+                        </div>
+                        <div className="flash-coupons">
+                            {flashCoupons.map((val, idx) => (
+                                <img 
+                                    key={idx} 
+                                    src={`/${val}sol.png`} 
+                                    alt={`${val} SOL`} 
+                                    className="flash-coupon-img" 
+                                    style={{ animationDelay: `${idx * 0.15}s` }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

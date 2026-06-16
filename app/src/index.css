@@ -42,8 +42,8 @@ body {
   font-family: 'Inter', sans-serif;
   background: var(--bg-base);
   color: var(--text-main);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -117,7 +117,8 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 1;
   width: 100%;
   max-width: 440px;
-  min-height: 92vh;
+  height: 92vh;
+  max-height: 92vh;
   margin: 4vh auto;
   background-image: url('/bg.png');
   background-size: cover;
@@ -847,7 +848,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .coupon-img {
   width: 100%;
-  height: auto;
+  aspect-ratio: 2.7 / 1;
+  object-fit: fill;
   display: block;
 }
 
@@ -859,4 +861,65 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--primary);
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(8px);
+}
+
+/* ========== Flash Overlay ========== */
+.flash-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.flash-content {
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.flash-header {
+  animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.flash-coupons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.flash-coupon-img {
+  width: 90%;
+  max-width: 300px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(232, 138, 26, 0.4);
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }

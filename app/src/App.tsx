@@ -5,7 +5,8 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { MerchantDashboard } from './pages/MerchantDashboard';
 import { InitializeProtocol } from './components/InitializeProtocol';
 import { LoginScreen } from './components/LoginScreen';
-import { UserOnboarding, UserProfile } from './components/UserOnboarding';
+import { UserOnboarding } from './components/UserOnboarding';
+import type { UserProfile } from './components/UserOnboarding';
 import { Home, Search, Activity, User, ArrowUpRight, ArrowDownLeft, Wallet, Shield, History, MapPin } from 'lucide-react';
 
 const App: FC = () => {
@@ -32,6 +33,8 @@ const App: FC = () => {
     setUserProfile(profile);
   };
 
+  // TEMPORARILY DISABLED: Login and Onboarding Gates
+  /*
   // If wallet is NOT connected, show the Login Screen
   if (!connected) {
     return (
@@ -63,6 +66,7 @@ const App: FC = () => {
       </>
     );
   }
+  */
 
   const renderTabContent = () => {
     // Home tab ALWAYS shows MerchantDashboard and passes the user profile down
