@@ -18,10 +18,10 @@ const App: FC = () => {
       return (
         <div className="animate-slide-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: '20px' }}>
           <Wallet size={56} color="var(--primary)" style={{ opacity: 0.3 }} />
-          <h3 style={{ color: 'var(--accent)', textAlign: 'center', fontWeight: 700 }}>
+          <h3 style={{ color: '#ffffff', textAlign: 'center', fontWeight: 700 }}>
             Connect to view {activeTab}
           </h3>
-          <p style={{ color: 'var(--primary)', textAlign: 'center', fontSize: '0.9rem', maxWidth: '250px', fontWeight: 500 }}>
+          <p style={{ color: '#ffffff', textAlign: 'center', fontSize: '0.9rem', maxWidth: '250px', fontWeight: 500 }}>
             Please connect your Solana wallet to access your profile and activity.
           </p>
           <div style={{ marginTop: '10px' }}>
