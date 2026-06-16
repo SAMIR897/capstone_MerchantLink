@@ -1,53 +1,104 @@
+import { useState } from 'react';
 import type { FC } from 'react';
-import { Navbar } from './components/Navbar';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { MerchantDashboard } from './pages/MerchantDashboard';
-import { LayoutDashboard, Store, Settings, LogOut } from 'lucide-react';
+import { Home, Search, Activity, User } from 'lucide-react';
 
 const App: FC = () => {
+  const [activeTab, setActiveTab] = useState('home');
+
   return (
-    <div className="dashboard-layout">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '60px' }}>
-          <div style={{
-              width: '44px', height: '44px', borderRadius: '12px',
-              background: 'linear-gradient(135deg, var(--secondary), var(--primary))',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: '800', fontSize: '24px', color: '#000',
-              boxShadow: '0 4px 20px rgba(0, 229, 255, 0.4)'
-          }}>
-              M
+    <>
+      {/* Ambient Background */}
+      <div className="ambient-bg">
+        <div className="ambient-orb" />
+        <div className="ambient-orb" />
+        <div className="ambient-orb" />
+      </div>
+
+      {/* Phone Frame */}
+      <div className="phone-frame">
+        {/* Header */}
+        <div className="phone-header">
+          <div className="phone-header-brand">
+            <div className="phone-header-logo">M</div>
+            <span className="phone-header-title">MerchantLink</span>
           </div>
-          <h2 style={{ margin: 0, fontSize: '1.4rem' }}>MerchantLink</h2>
+          <WalletMultiButton />
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', color: 'white', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <LayoutDashboard size={20} color="var(--secondary)" />
-            <span style={{ fontWeight: 500 }}>Dashboard</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', color: 'var(--text-muted)', cursor: 'pointer', transition: 'color 0.2s' }} className="sidebar-link">
-            <Store size={20} />
-            <span style={{ fontWeight: 500 }}>My Storefront</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', color: 'var(--text-muted)', cursor: 'pointer', transition: 'color 0.2s' }} className="sidebar-link">
-            <Settings size={20} />
-            <span style={{ fontWeight: 500 }}>Settings</span>
-          </div>
-        </nav>
+        {/* Scrollable Body */}
+        <div className="phone-body">
+          {activeTab === 'home' && <MerchantDashboard />}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', color: 'var(--text-muted)', cursor: 'pointer' }}>
-            <LogOut size={20} />
-            <span style={{ fontWeight: 500 }}>Disconnect</span>
+          {activeTab === 'explore' && (
+            <div className="placeholder-tab animate-slide-up">
+              <div className="placeholder-tab-icon">
+                <Search size={26} />
+              </div>
+              <h3>Explore</h3>
+              <p>Discover merchants and gift card deals near you</p>
+            </div>
+          )}
+
+          {activeTab === 'activity' && (
+            <div className="placeholder-tab animate-slide-up">
+              <div className="placeholder-tab-icon">
+                <Activity size={26} />
+              </div>
+              <h3>Activity</h3>
+              <p>Your transaction history and loyalty rewards</p>
+            </div>
+          )}
+
+          {activeTab === 'profile' && (
+            <div className="placeholder-tab animate-slide-up">
+              <div className="placeholder-tab-icon">
+                <User size={26} />
+              </div>
+              <h3>Profile</h3>
+              <p>Manage your wallet and account settings</p>
+            </div>
+          )}
         </div>
-      </aside>
 
-      {/* Main Content */}
-      <main className="main-content">
-        <Navbar />
-        <MerchantDashboard />
-      </main>
-    </div>
+        {/* Bottom Navigation */}
+        <div className="phone-bottom-nav">
+          <button
+            className={`nav-tab ${activeTab === 'home' ? 'active' : ''}`}
+            onClick={() => setActiveTab('home')}
+          >
+            <Home size={20} />
+            Home
+            <span className="nav-tab-dot" />
+          </button>
+          <button
+            className={`nav-tab ${activeTab === 'explore' ? 'active' : ''}`}
+            onClick={() => setActiveTab('explore')}
+          >
+            <Search size={20} />
+            Explore
+            <span className="nav-tab-dot" />
+          </button>
+          <button
+            className={`nav-tab ${activeTab === 'activity' ? 'active' : ''}`}
+            onClick={() => setActiveTab('activity')}
+          >
+            <Activity size={20} />
+            Activity
+            <span className="nav-tab-dot" />
+          </button>
+          <button
+            className={`nav-tab ${activeTab === 'profile' ? 'active' : ''}`}
+            onClick={() => setActiveTab('profile')}
+          >
+            <User size={20} />
+            Profile
+            <span className="nav-tab-dot" />
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
 
