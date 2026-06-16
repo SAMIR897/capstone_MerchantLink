@@ -1,18 +1,23 @@
-import type { FC } from 'react';
 import { useState } from 'react';
+import type { FC } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Store, Send, CheckCircle2, CreditCard, ShieldCheck, Gift, CircleCheck } from 'lucide-react';
 import idl from '../idl/merchant_link.json';
+import type { UserProfile } from '../components/UserOnboarding';
 
 const PROGRAM_ID = new PublicKey((idl as any).address || "Do2bnhgFrAxQbGB4woahzBKyQZm4efHaDnk2FQzSVsJh");
 
 // Placeholder for "The Platform" Merchant Admin Wallet
 const PLATFORM_ADMIN_PUBKEY = new PublicKey("11111111111111111111111111111111"); 
 
-export const MerchantDashboard: FC = () => {
+interface MerchantDashboardProps {
+    userProfile: UserProfile | null;
+}
+
+export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) => {
     const { connection } = useConnection();
     const wallet = useWallet();
 
@@ -67,12 +72,36 @@ export const MerchantDashboard: FC = () => {
             const provider = new AnchorProvider(connection, wallet as any, { preflightCommitment: 'confirmed' });
             const program = new Program(idl as any, provider);
 
+            if (actionType === 'buy') {
+                if (buySource === 'merchant') {
+                    // MOCK SPL TRANSFER (User buying from another merchant's inventory)
+                    console.log(`Executing SPL Token Transfer from ${merchantAddress} to Consumer...`);
+                    setTimeout(() => {
+                        setSuccessMsg(`SPL Transfer complete! Received from ${merchantAddress.slice(0,4)}...`);
+                        setTimeout(() => setSuccessMsg(''), 5000);
+                        setIsLoading(false);
+                    }, 1500);
+                    return; // Early return to bypass anchor mint call
+                }
+
+                if (buySource === 'platform' && userProfile?.role === 'merchant') {
+                    // MOCK DISCOUNTED MINT (Frontend demo to bypass fixed Anchor price)
+                    console.log(`Executing Discounted Purchase: 20% OFF applied!`);
+                    setTimeout(() => {
+                        setSuccessMsg(`Purchase complete with 20% Merchant Discount!`);
+                        setTimeout(() => setSuccessMsg(''), 5000);
+                        setIsLoading(false);
+                    }, 1500);
+                    return; // Early return
+                }
+            }
+
             if (actionType === 'buy' || (actionType === 'issue' && issueSource !== 'collection')) {
                 // Determine Merchant Admin Pubkey
                 let adminPubkey: PublicKey;
                 try {
                     if (actionType === 'buy') {
-                        adminPubkey = buySource === 'platform' ? PLATFORM_ADMIN_PUBKEY : new PublicKey(merchantAddress);
+                        adminPubkey = PLATFORM_ADMIN_PUBKEY;
                     } else {
                         adminPubkey = issueSource === 'buy_platform' ? PLATFORM_ADMIN_PUBKEY : new PublicKey(issueMerchantAddress);
                     }
@@ -216,7 +245,14 @@ export const MerchantDashboard: FC = () => {
                                             onClick={() => setSelectedCoupon(c.sol)}
                                         >
                                             <img src={c.img} alt={`${c.sol} SOL`} className="coupon-img" />
-                                            <div className="coupon-label">{c.sol} SOL</div>
+                                            {userProfile?.role === 'merchant' ? (
+                                                <div className="coupon-label" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                    <span style={{ textDecoration: 'line-through', color: 'var(--error)', fontSize: '0.75rem', opacity: 0.8 }}>{c.sol} SOL</span>
+                                                    <span style={{ color: 'var(--success)' }}>{(c.sol * 0.8).toFixed(1)} SOL</span>
+                                                </div>
+                                            ) : (
+                                                <div className="coupon-label">{c.sol} SOL</div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>

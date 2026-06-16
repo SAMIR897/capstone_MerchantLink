@@ -1,15 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { MerchantDashboard } from './pages/MerchantDashboard';
 import { InitializeProtocol } from './components/InitializeProtocol';
 import { LoginScreen } from './components/LoginScreen';
+import { UserOnboarding, UserProfile } from './components/UserOnboarding';
 import { Home, Search, Activity, User, ArrowUpRight, ArrowDownLeft, Wallet, Shield, History, MapPin } from 'lucide-react';
 
 const App: FC = () => {
   const [activeTab, setActiveTab] = useState('home');
-  const { connected } = useWallet();
+  const { connected, publicKey } = useWallet();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  // Load user profile from localStorage when wallet connects
+  useEffect(() => {
+    if (connected && publicKey) {
+      const savedProfile = localStorage.getItem(`merchant_link_user_${publicKey.toBase58()}`);
+      if (savedProfile) {
+        setUserProfile(JSON.parse(savedProfile));
+      } else {
+        setUserProfile(null);
+      }
+    } else {
+      setUserProfile(null);
+    }
+  }, [connected, publicKey]);
+
+  const handleOnboardingComplete = (profile: UserProfile) => {
+    localStorage.setItem(`merchant_link_user_${profile.wallet}`, JSON.stringify(profile));
+    setUserProfile(profile);
+  };
 
   // If wallet is NOT connected, show the Login Screen
   if (!connected) {
@@ -27,9 +48,25 @@ const App: FC = () => {
     );
   }
 
+  // If connected but no profile, show Onboarding Screen
+  if (connected && !userProfile) {
+    return (
+      <>
+        <div className="ambient-bg">
+          <div className="ambient-orb" />
+          <div className="ambient-orb" />
+          <div className="ambient-orb" />
+        </div>
+        <div className="phone-frame">
+          <UserOnboarding onComplete={handleOnboardingComplete} />
+        </div>
+      </>
+    );
+  }
+
   const renderTabContent = () => {
-    // Home tab ALWAYS shows MerchantDashboard (since it handles its own wallet connection state)
-    if (activeTab === 'home') return <MerchantDashboard />;
+    // Home tab ALWAYS shows MerchantDashboard and passes the user profile down
+    if (activeTab === 'home') return <MerchantDashboard userProfile={userProfile} />;
 
     // Connected States for other tabs
     if (activeTab === 'explore') {
@@ -108,8 +145,10 @@ const App: FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '10px' }}>
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', border: '2px solid var(--primary)' }} />
             <div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>Merchant User</div>
-              <div style={{ color: 'var(--primary)', fontSize: '0.9rem', marginTop: '2px' }}>Connected</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>{userProfile?.username || 'User'}</div>
+              <div style={{ color: 'var(--primary)', fontSize: '0.9rem', marginTop: '2px', textTransform: 'capitalize' }}>
+                {userProfile?.role || 'Customer'}
+              </div>
             </div>
           </div>
           
@@ -132,7 +171,7 @@ const App: FC = () => {
             </div>
           </div>
           
-          <InitializeProtocol />
+          {userProfile?.role === 'merchant' && <InitializeProtocol />}
         </div>
       );
     }
