@@ -1,9 +1,19 @@
 import type { FC } from 'react';
 import { useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { Program, AnchorProvider } from '@coral-xyz/anchor';
+import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Store, Send, CheckCircle2, CreditCard, ShieldCheck, Gift, CircleCheck } from 'lucide-react';
+import idl from '../idl/merchant_link.json';
+
+const PROGRAM_ID = new PublicKey((idl as any).address || "Do2bnhgFrAxQbGB4woahzBKyQZm4efHaDnk2FQzSVsJh");
+
+// Placeholder for "The Platform" Merchant Admin Wallet
+const PLATFORM_ADMIN_PUBKEY = new PublicKey("11111111111111111111111111111111"); 
 
 export const MerchantDashboard: FC = () => {
+    const { connection } = useConnection();
     const wallet = useWallet();
 
     const [actionType, setActionType] = useState<'buy' | 'issue'>('buy');
@@ -17,15 +27,17 @@ export const MerchantDashboard: FC = () => {
     const [isVerified, setIsVerified] = useState(false);
     const [mockUser, setMockUser] = useState<{username: string, loyaltyScore: number} | null>(null);
     const [issueSource, setIssueSource] = useState<'collection' | 'buy_merchant' | 'buy_platform'>('collection');
+    const [issueMerchantAddress, setIssueMerchantAddress] = useState('');
     
     // Common State
     const [isLoading, setIsLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState('');
+    const [txHash, setTxHash] = useState<string | null>(null);
 
     const verifyUser = () => {
         if (!issueAddress) return;
         setIsLoading(true);
-        // Mocking an API call
+        // Mocking an API call for User verification
         setTimeout(() => {
             setMockUser({ username: 'CryptoKing', loyaltyScore: 450 });
             setIsVerified(true);
@@ -33,14 +45,86 @@ export const MerchantDashboard: FC = () => {
         }, 600);
     };
 
-    const handleTransaction = () => {
-        setIsLoading(true);
-        // Mocking transaction delay
-        setTimeout(() => {
+    const handleTransaction = async () => {
+        if (!wallet.publicKey || !wallet.signTransaction) return;
+
+        try {
+            setIsLoading(true);
+            setSuccessMsg('');
+            setTxHash(null);
+
+            const provider = new AnchorProvider(connection, wallet as any, { preflightCommitment: 'confirmed' });
+            const program = new Program(idl as any, provider);
+
+            if (actionType === 'buy' || (actionType === 'issue' && issueSource !== 'collection')) {
+                // Determine Merchant Admin Pubkey
+                let adminPubkey: PublicKey;
+                try {
+                    if (actionType === 'buy') {
+                        adminPubkey = buySource === 'platform' ? PLATFORM_ADMIN_PUBKEY : new PublicKey(merchantAddress);
+                    } else {
+                        adminPubkey = issueSource === 'buy_platform' ? PLATFORM_ADMIN_PUBKEY : new PublicKey(issueMerchantAddress);
+                    }
+                } catch (e) {
+                    throw new Error("Invalid Merchant Address!");
+                }
+
+                // Fetch Merchant State
+                const [merchantStatePda] = PublicKey.findProgramAddressSync(
+                    [Buffer.from("merchant"), adminPubkey.toBuffer()],
+                    PROGRAM_ID
+                );
+                
+                const merchantState = await program.account.merchantState.fetch(merchantStatePda);
+
+                // ATAs
+                const consumerUsdcAta = getAssociatedTokenAddressSync(merchantState.usdcMint, wallet.publicKey, false, TOKEN_PROGRAM_ID);
+                const consumerGiftCardAta = getAssociatedTokenAddressSync(merchantState.giftCardMint, wallet.publicKey, false, TOKEN_2022_PROGRAM_ID);
+                const consumerLoyaltyAta = getAssociatedTokenAddressSync(merchantState.loyaltyMint, wallet.publicKey, false, TOKEN_2022_PROGRAM_ID);
+
+                // Execute buy_gift_card on the blockchain!
+                const tx = await program.methods.buyGiftCard()
+                    .accounts({
+                        consumer: wallet.publicKey,
+                        merchantState: merchantStatePda,
+                        usdcMint: merchantState.usdcMint,
+                        consumerUsdcAta: consumerUsdcAta,
+                        merchantUsdcAta: merchantState.usdcTokenAccount,
+                        giftCardMint: merchantState.giftCardMint,
+                        consumerGiftCardAta: consumerGiftCardAta,
+                        loyaltyMint: merchantState.loyaltyMint,
+                        consumerLoyaltyAta: consumerLoyaltyAta,
+                        tokenProgram: TOKEN_PROGRAM_ID,
+                        tokenProgram2022: TOKEN_2022_PROGRAM_ID,
+                        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                        systemProgram: SystemProgram.programId,
+                    })
+                    .rpc();
+
+                setTxHash(tx);
+                setSuccessMsg('Transaction Successful!');
+                
+                // If it's an Issue flow, we'd normally transfer the Giftcard token here via standard SPL transfer
+                if (actionType === 'issue') {
+                    console.log(`Need to execute SPL Transfer to ${issueAddress}`);
+                }
+                
+                setTimeout(() => setSuccessMsg(''), 5000);
+
+            } else if (actionType === 'issue' && issueSource === 'collection') {
+                // Just an SPL token transfer mock for now
+                setTimeout(() => {
+                    setSuccessMsg('Gift card issued from collection!');
+                    setTimeout(() => setSuccessMsg(''), 4000);
+                }, 1000);
+            }
+
+        } catch (error: any) {
+            console.error("Tx Failed:", error);
+            alert(`Transaction failed! ${error.message || 'Ensure the merchant address is correct and you have Devnet USDC.'}`);
+        } finally {
             setIsLoading(false);
-            setSuccessMsg('Transaction Successful!');
-            setTimeout(() => setSuccessMsg(''), 4000);
-        }, 1500);
+        }
     };
 
     return (
@@ -132,7 +216,7 @@ export const MerchantDashboard: FC = () => {
                             onClick={handleTransaction}
                             disabled={!wallet.connected || isLoading || (buySource === 'merchant' && !merchantAddress)}
                         >
-                            {isLoading ? 'Processing...' : !wallet.connected ? 'Connect Wallet First' : 'Pay & Buy Giftcard'}
+                            {isLoading ? 'Processing Tx...' : !wallet.connected ? 'Connect Wallet First' : 'Pay & Buy Giftcard'}
                         </button>
                     </div>
                 )}
@@ -207,6 +291,8 @@ export const MerchantDashboard: FC = () => {
                                                 type="text" 
                                                 className="input-field" 
                                                 placeholder="Enter Merchant Address"
+                                                value={issueMerchantAddress}
+                                                onChange={(e) => setIssueMerchantAddress(e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -216,9 +302,9 @@ export const MerchantDashboard: FC = () => {
                                     className={`btn ${!wallet.connected ? 'btn-disabled' : 'btn-primary'}`} 
                                     style={{ width: '100%', height: '50px', fontSize: '1rem', background: 'linear-gradient(135deg, var(--secondary), #00b0ff)' }}
                                     onClick={handleTransaction}
-                                    disabled={!wallet.connected || isLoading}
+                                    disabled={!wallet.connected || isLoading || (issueSource === 'buy_merchant' && !issueMerchantAddress)}
                                 >
-                                    {isLoading ? 'Processing...' : !wallet.connected ? 'Connect Wallet First' : (issueSource === 'collection' ? 'Issue Giftcard' : 'Pay & Issue Giftcard')}
+                                    {isLoading ? 'Processing Tx...' : !wallet.connected ? 'Connect Wallet First' : (issueSource === 'collection' ? 'Issue Giftcard' : 'Pay & Issue Giftcard')}
                                 </button>
                             </div>
                         )}
@@ -232,6 +318,11 @@ export const MerchantDashboard: FC = () => {
                             <strong style={{ color: 'var(--text-main)', fontSize: '0.9rem' }}>
                                 {successMsg}
                             </strong>
+                            {txHash && (
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px', wordBreak: 'break-all' }}>
+                                    Hash: {txHash}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

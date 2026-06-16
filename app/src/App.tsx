@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { MerchantDashboard } from './pages/MerchantDashboard';
+import { InitializeProtocol } from './components/InitializeProtocol';
 import { Home, Search, Activity, User, ArrowUpRight, ArrowDownLeft, Wallet, Shield, History, MapPin } from 'lucide-react';
 
 const App: FC = () => {
@@ -131,6 +132,8 @@ const App: FC = () => {
               <span style={{ flex: 1, fontWeight: 500 }}>Personal Details</span>
             </div>
           </div>
+          
+          <InitializeProtocol />
         </div>
       );
     }
@@ -167,7 +170,7 @@ const App: FC = () => {
             className={`nav-tab ${activeTab === 'home' ? 'active' : ''}`}
             onClick={() => setActiveTab('home')}
           >
-            <Home size={20} />
+            <Home size={18} />
             Home
             <span className="nav-tab-dot" />
           </button>
@@ -175,7 +178,7 @@ const App: FC = () => {
             className={`nav-tab ${activeTab === 'explore' ? 'active' : ''}`}
             onClick={() => setActiveTab('explore')}
           >
-            <Search size={20} />
+            <Search size={18} />
             Explore
             <span className="nav-tab-dot" />
           </button>
@@ -183,7 +186,7 @@ const App: FC = () => {
             className={`nav-tab ${activeTab === 'activity' ? 'active' : ''}`}
             onClick={() => setActiveTab('activity')}
           >
-            <Activity size={20} />
+            <Activity size={18} />
             Activity
             <span className="nav-tab-dot" />
           </button>
@@ -191,7 +194,7 @@ const App: FC = () => {
             className={`nav-tab ${activeTab === 'profile' ? 'active' : ''}`}
             onClick={() => setActiveTab('profile')}
           >
-            <User size={20} />
+            <User size={18} />
             Profile
             <span className="nav-tab-dot" />
           </button>
