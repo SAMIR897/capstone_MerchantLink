@@ -3,9 +3,9 @@
 :root {
   /* Warm Chocolaty Dark Palette */
   --bg-base: #080604;
-  --bg-card: #111010;
-  --bg-card-elevated: #1a1714;
-  --bg-input: #0d0b09;
+  --bg-card: rgba(17, 16, 16, 0.45);
+  --bg-card-elevated: rgba(26, 23, 20, 0.55);
+  --bg-input: rgba(13, 11, 9, 0.45);
 
   --primary: #e88a1a;
   --primary-hover: #f5a623;
@@ -108,7 +108,7 @@ h1, h2, h3, h4, h5, h6 {
   0% { transform: translate(0, 0) scale(1); }
   33% { transform: translate(20px, -30px) scale(1.05); }
   66% { transform: translate(-15px, 20px) scale(0.95); }
-  100% { transform: translate(10px, -10px) scale(1.02); }
+  100% { transform: translate(-20px, -10px) scale(1.1); }
 }
 
 /* ========== Phone Frame ========== */
@@ -116,10 +116,13 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
   min-height: 88vh;
   margin: 6vh auto;
-  background: linear-gradient(180deg, #0e0c0a 0%, #0a0908 40%, #080604 100%);
+  background-image: url('/bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border-radius: var(--radius-phone);
   border: 1px solid rgba(232, 138, 26, 0.1);
   box-shadow:
@@ -214,10 +217,11 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 14px 16px 22px;
-  background: linear-gradient(180deg, transparent, rgba(10, 8, 4, 0.95) 30%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  padding: 8px 16px 10px;
+  background: rgba(10, 8, 4, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
   z-index: 10;
 }
 
@@ -290,6 +294,8 @@ h1, h2, h3, h4, h5, h6 {
 /* ========== Glass Cards / Panels ========== */
 .glass-panel {
   background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 20px;
