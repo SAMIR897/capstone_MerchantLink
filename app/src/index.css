@@ -1,30 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Warm Chocolaty Dark Palette */
-  --bg-base: #080604;
-  --bg-card: rgba(17, 16, 16, 0.45);
-  --bg-card-elevated: rgba(26, 23, 20, 0.55);
-  --bg-input: rgba(13, 11, 9, 0.45);
+  /* Parrot Green Palette */
+  --bg-base: #040806;
+  --bg-card: rgba(10, 16, 12, 0.45);
+  --bg-card-elevated: rgba(14, 24, 18, 0.55);
+  --bg-input: rgba(6, 12, 8, 0.45);
 
-  --primary: #e88a1a;
-  --primary-hover: #f5a623;
-  --primary-dim: rgba(232, 138, 26, 0.12);
-  --secondary: #ff6b2c;
-  --accent: #ffb347;
-  --accent-dim: rgba(255, 179, 71, 0.08);
+  --primary: #ccff00;
+  --primary-hover: #b8e600;
+  --primary-dim: rgba(204, 255, 0, 0.12);
+  --secondary: #33ffaa;
+  --accent: #e6ff00;
+  --accent-dim: rgba(230, 255, 0, 0.08);
 
-  --text-main: #f2ece4;
-  --text-muted: #7a7068;
-  --text-warm: #c4a882;
-  --text-bright: #ffe8cc;
+  --text-main: #f0f7f2;
+  --text-muted: #82998b;
+  --text-warm: #a6cca6;
+  --text-bright: #e6ffcc;
 
-  --border: rgba(255, 179, 71, 0.08);
-  --border-hover: rgba(232, 138, 26, 0.25);
-  --border-active: rgba(232, 138, 26, 0.5);
+  --border: rgba(204, 255, 0, 0.08);
+  --border-hover: rgba(204, 255, 0, 0.25);
+  --border-active: rgba(204, 255, 0, 0.5);
 
-  --glow-primary: 0 0 30px rgba(232, 138, 26, 0.2);
-  --glow-warm: 0 8px 32px rgba(232, 138, 26, 0.15);
+  --glow-primary: 0 0 30px rgba(204, 255, 0, 0.2);
+  --glow-warm: 0 8px 32px rgba(204, 255, 0, 0.15);
 
   --radius-sm: 12px;
   --radius-md: 18px;
@@ -78,7 +78,7 @@ h1, h2, h3, h4, h5, h6 {
 .ambient-orb:nth-child(1) {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(232, 138, 26, 0.3), transparent 70%);
+  background: radial-gradient(circle, rgba(204, 255, 0, 0.3), transparent 70%);
   top: 10%;
   left: 15%;
   animation-duration: 14s;
@@ -87,7 +87,7 @@ h1, h2, h3, h4, h5, h6 {
 .ambient-orb:nth-child(2) {
   width: 250px;
   height: 250px;
-  background: radial-gradient(circle, rgba(255, 107, 44, 0.2), transparent 70%);
+  background: radial-gradient(circle, rgba(51, 255, 170, 0.2), transparent 70%);
   bottom: 15%;
   right: 10%;
   animation-duration: 18s;
@@ -125,10 +125,10 @@ h1, h2, h3, h4, h5, h6 {
   background-position: center;
   background-repeat: no-repeat;
   border-radius: var(--radius-phone);
-  border: 1px solid rgba(232, 138, 26, 0.1);
+  border: 1px solid rgba(204, 255, 0, 0.1);
   box-shadow:
     0 0 0 1px rgba(255, 179, 71, 0.04),
-    0 4px 60px -10px rgba(232, 138, 26, 0.15),
+    0 4px 60px -10px rgba(204, 255, 0, 0.15),
     0 20px 80px -20px rgba(0, 0, 0, 0.8),
     inset 0 1px 0 rgba(255, 200, 100, 0.06);
   display: flex;
@@ -176,7 +176,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 800;
   font-size: 20px;
   color: #0a0604;
-  box-shadow: 0 4px 16px rgba(232, 138, 26, 0.35);
+  box-shadow: 0 4px 16px rgba(204, 255, 0, 0.35);
 }
 
 .phone-header-title {
@@ -205,7 +205,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .phone-body::-webkit-scrollbar-thumb {
-  background: rgba(232, 138, 26, 0.2);
+  background: rgba(204, 255, 0, 0.2);
   border-radius: 10px;
 }
 
@@ -312,7 +312,7 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(232, 138, 26, 0.15), transparent);
+  background: linear-gradient(90deg, transparent, rgba(204, 255, 0, 0.15), transparent);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -367,13 +367,13 @@ h1, h2, h3, h4, h5, h6 {
 .stat-icon.primary {
   background: var(--primary-dim);
   color: var(--primary);
-  border: 1px solid rgba(232, 138, 26, 0.15);
+  border: 1px solid rgba(204, 255, 0, 0.15);
 }
 
 .stat-icon.secondary {
-  background: rgba(255, 107, 44, 0.1);
+  background: rgba(51, 255, 170, 0.1);
   color: var(--secondary);
-  border: 1px solid rgba(255, 107, 44, 0.15);
+  border: 1px solid rgba(51, 255, 170, 0.15);
 }
 
 .stat-label {
@@ -475,7 +475,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .input-field:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(232, 138, 26, 0.1);
+  box-shadow: 0 0 0 3px rgba(204, 255, 0, 0.1);
   background: rgba(20, 16, 10, 1);
 }
 
@@ -501,18 +501,18 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: #0a0604;
-  box-shadow: 0 4px 20px rgba(232, 138, 26, 0.35);
+  box-shadow: 0 4px 20px rgba(204, 255, 0, 0.35);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(232, 138, 26, 0.5);
+  box-shadow: 0 6px 28px rgba(204, 255, 0, 0.5);
   filter: brightness(1.1);
 }
 
 .btn-primary:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 12px rgba(232, 138, 26, 0.3);
+  box-shadow: 0 2px 12px rgba(204, 255, 0, 0.3);
 }
 
 .btn-disabled {
@@ -527,8 +527,8 @@ h1, h2, h3, h4, h5, h6 {
 .success-banner {
   margin-top: 16px;
   padding: 14px 16px;
-  background: rgba(232, 138, 26, 0.06);
-  border: 1px solid rgba(232, 138, 26, 0.15);
+  background: rgba(204, 255, 0, 0.06);
+  border: 1px solid rgba(204, 255, 0, 0.15);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: flex-start;
@@ -553,7 +553,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600 !important;
   font-size: 0.75rem !important;
   background: var(--primary-dim) !important;
-  border: 1px solid rgba(232, 138, 26, 0.15) !important;
+  border: 1px solid rgba(204, 255, 0, 0.15) !important;
   border-radius: 12px !important;
   transition: all 0.3s ease !important;
   padding: 0 14px !important;
@@ -562,7 +562,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .wallet-adapter-button:not([disabled]):hover {
-  background: rgba(232, 138, 26, 0.18) !important;
+  background: rgba(204, 255, 0, 0.18) !important;
   border-color: var(--primary) !important;
   box-shadow: var(--glow-primary) !important;
   transform: translateY(-1px) !important;
@@ -775,7 +775,7 @@ h1, h2, h3, h4, h5, h6 {
 .role-card.selected {
   border-color: var(--primary);
   background: var(--primary-dim);
-  box-shadow: 0 0 0 1px var(--primary), 0 8px 24px rgba(232, 138, 26, 0.2);
+  box-shadow: 0 0 0 1px var(--primary), 0 8px 24px rgba(204, 255, 0, 0.2);
 }
 
 .role-card.selected .role-icon {
@@ -838,12 +838,12 @@ h1, h2, h3, h4, h5, h6 {
 .coupon-card:hover {
   border-color: var(--primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(232, 138, 26, 0.15);
+  box-shadow: 0 4px 16px rgba(204, 255, 0, 0.15);
 }
 
 .coupon-selected {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px var(--primary-dim), 0 4px 20px rgba(232, 138, 26, 0.25);
+  box-shadow: 0 0 0 2px var(--primary-dim), 0 4px 20px rgba(204, 255, 0, 0.25);
 }
 
 .coupon-img {
@@ -903,7 +903,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 90%;
   max-width: 300px;
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(232, 138, 26, 0.4);
+  box-shadow: 0 10px 40px rgba(204, 255, 0, 0.4);
   opacity: 0;
   transform: translateY(20px) scale(0.9);
   animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;

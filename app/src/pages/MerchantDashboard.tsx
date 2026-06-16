@@ -242,7 +242,7 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                     </button>
                     <button 
                         onClick={() => { setActionType('issue'); setSuccessMsg(''); }}
-                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'issue' ? 'var(--secondary)' : 'var(--border)'}`, background: actionType === 'issue' ? 'rgba(0,229,255,0.1)' : 'transparent', color: actionType === 'issue' ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'issue' ? 'var(--secondary)' : 'var(--border)'}`, background: actionType === 'issue' ? 'rgba(51,255,170,0.1)' : 'transparent', color: actionType === 'issue' ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
                     >
                         Issue a Gift Card
                     </button>
@@ -350,7 +350,7 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
 
                         {isVerified && mockUser && (
                             <div className="animate-slide-up" style={{ marginTop: '20px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.2)', borderRadius: '12px', marginBottom: '24px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', background: 'rgba(51,255,170,0.08)', border: '1px solid rgba(51,255,170,0.2)', borderRadius: '12px', marginBottom: '24px' }}>
                                     <CircleCheck size={24} color="var(--secondary)" />
                                     <div>
                                         <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>@{mockUser.username}</div>
@@ -395,7 +395,7 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
 
                                 <button 
                                     className={`btn ${!wallet.connected ? 'btn-disabled' : 'btn-primary'}`} 
-                                    style={{ width: '100%', height: '44px', fontSize: '0.85rem', background: 'linear-gradient(135deg, var(--secondary), #00b0ff)' }}
+                                    style={{ width: '100%', height: '44px', fontSize: '0.85rem', background: 'linear-gradient(135deg, var(--secondary), #00e5ff)', color: '#002211', fontWeight: 600, border: 'none' }}
                                     onClick={handleTransaction}
                                     disabled={!wallet.connected || isLoading || (issueSource === 'buy_merchant' && !issueMerchantAddress)}
                                 >
