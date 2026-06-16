@@ -29,7 +29,7 @@
   --radius-sm: 12px;
   --radius-md: 18px;
   --radius-lg: 24px;
-  --radius-phone: 40px;
+  --radius-phone: 24px;
 }
 
 * {
@@ -644,4 +644,155 @@ h1, h2, h3, h4, h5, h6 {
     border: none;
     box-shadow: none;
   }
+}
+
+/* ========== Login Screen ========== */
+.login-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 92vh;
+  background-image: url('/bg1.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.login-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 2;
+  margin-top: 4vh;
+  margin-bottom: 15vh;
+  animation: login-fade-in 1s ease forwards;
+}
+
+@keyframes login-fade-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.login-logo {
+  width: 440px;
+  max-width: 95%;
+  filter: drop-shadow(0 4px 30px rgba(0,0,0,0.5));
+  animation: logo-float 3s ease-in-out infinite;
+}
+
+.login-top-logo {
+  position: absolute;
+  top: 120px;
+  width: 200px;
+  max-width: 75%;
+  z-index: 10;
+  opacity: 0.9;
+}
+
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.login-tagline {
+  color: #ffffff;
+  font-size: 0.9rem;
+  text-align: center;
+  max-width: 260px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-top: 60px;
+}
+
+.login-content .wallet-adapter-button {
+  height: 64px;
+  padding: 0 40px;
+  font-size: 1.3rem;
+  margin-top: 24px;
+  border-radius: 16px;
+}
+
+/* Corner Frames */
+.corner-frame {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  z-index: 1;
+}
+
+.corner-frame.top-left {
+  top: 24px;
+  left: 24px;
+  border-top: 2px solid rgba(255,179,71,0.5);
+  border-left: 2px solid rgba(255,179,71,0.5);
+}
+
+.corner-frame.top-right {
+  top: 24px;
+  right: 24px;
+  border-top: 2px solid rgba(255,179,71,0.5);
+  border-right: 2px solid rgba(255,179,71,0.5);
+}
+
+.corner-frame.bottom-left {
+  bottom: 24px;
+  left: 24px;
+  border-bottom: 2px solid rgba(255,179,71,0.5);
+  border-left: 2px solid rgba(255,179,71,0.5);
+}
+
+.corner-frame.bottom-right {
+  bottom: 24px;
+  right: 24px;
+  border-bottom: 2px solid rgba(255,179,71,0.5);
+  border-right: 2px solid rgba(255,179,71,0.5);
+}
+
+/* ========== Coupon Grid ========== */
+.coupon-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.coupon-card {
+  position: relative;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: rgba(255,255,255,0.03);
+}
+
+.coupon-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(232, 138, 26, 0.15);
+}
+
+.coupon-selected {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px var(--primary-dim), 0 4px 20px rgba(232, 138, 26, 0.25);
+}
+
+.coupon-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.coupon-label {
+  text-align: center;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
 }

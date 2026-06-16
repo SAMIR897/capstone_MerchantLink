@@ -4,33 +4,32 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { MerchantDashboard } from './pages/MerchantDashboard';
 import { InitializeProtocol } from './components/InitializeProtocol';
+import { LoginScreen } from './components/LoginScreen';
 import { Home, Search, Activity, User, ArrowUpRight, ArrowDownLeft, Wallet, Shield, History, MapPin } from 'lucide-react';
 
 const App: FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const { connected } = useWallet();
 
+  // If wallet is NOT connected, show the Login Screen
+  if (!connected) {
+    return (
+      <>
+        <div className="ambient-bg">
+          <div className="ambient-orb" />
+          <div className="ambient-orb" />
+          <div className="ambient-orb" />
+        </div>
+        <div className="phone-frame">
+          <LoginScreen />
+        </div>
+      </>
+    );
+  }
+
   const renderTabContent = () => {
     // Home tab ALWAYS shows MerchantDashboard (since it handles its own wallet connection state)
     if (activeTab === 'home') return <MerchantDashboard />;
-
-    // For all other tabs, if wallet is not connected, show Connect Wallet button in the middle
-    if (!connected) {
-      return (
-        <div className="animate-slide-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: '20px' }}>
-          <Wallet size={56} color="var(--primary)" style={{ opacity: 0.3 }} />
-          <h3 style={{ color: '#ffffff', textAlign: 'center', fontWeight: 700 }}>
-            Connect to view {activeTab}
-          </h3>
-          <p style={{ color: '#ffffff', textAlign: 'center', fontSize: '0.9rem', maxWidth: '250px', fontWeight: 500 }}>
-            Please connect your Solana wallet to access your profile and activity.
-          </p>
-          <div style={{ marginTop: '10px' }}>
-            <WalletMultiButton />
-          </div>
-        </div>
-      );
-    }
 
     // Connected States for other tabs
     if (activeTab === 'explore') {

@@ -21,6 +21,17 @@ export const MerchantDashboard: FC = () => {
     // Buy State
     const [buySource, setBuySource] = useState<'platform' | 'merchant'>('platform');
     const [merchantAddress, setMerchantAddress] = useState('');
+    const [selectedCoupon, setSelectedCoupon] = useState<number | null>(null);
+
+    const coupons = [
+        { sol: 1, img: '/1sol.png' },
+        { sol: 2, img: '/2sol.png' },
+        { sol: 5, img: '/5sol.png' },
+        { sol: 10, img: '/10sol.png' },
+        { sol: 20, img: '/20sol.png' },
+        { sol: 50, img: '/50sol.png' },
+        { sol: 100, img: '/100sol.png' },
+    ];
     
     // Issue State
     const [issueAddress, setIssueAddress] = useState('');
@@ -193,6 +204,24 @@ export const MerchantDashboard: FC = () => {
                                 <span style={{ color: 'var(--text-main)', fontWeight: 500, fontSize: '0.85rem' }}>Buy from Any Merchant</span>
                             </label>
                         </div>
+
+                        {buySource === 'platform' && (
+                            <div className="animate-slide-up" style={{ marginBottom: '20px' }}>
+                                <label className="input-label" style={{ marginBottom: '12px', display: 'block' }}>Select a Coupon</label>
+                                <div className="coupon-grid">
+                                    {coupons.map((c) => (
+                                        <div 
+                                            key={c.sol}
+                                            className={`coupon-card ${selectedCoupon === c.sol ? 'coupon-selected' : ''}`}
+                                            onClick={() => setSelectedCoupon(c.sol)}
+                                        >
+                                            <img src={c.img} alt={`${c.sol} SOL`} className="coupon-img" />
+                                            <div className="coupon-label">{c.sol} SOL</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {buySource === 'merchant' && (
                             <div className="form-group animate-slide-up" style={{ marginBottom: '20px' }}>
