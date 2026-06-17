@@ -1,18 +1,41 @@
 import { useState, useEffect } from 'react';
 import type { FC } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { MerchantDashboard } from './pages/MerchantDashboard';
 import { InitializeProtocol } from './components/InitializeProtocol';
 import { LoginScreen } from './components/LoginScreen';
 import { UserOnboarding } from './components/UserOnboarding';
 import type { UserProfile } from './components/UserOnboarding';
-import { Home, Search, Activity, User, ArrowUpRight, ArrowDownLeft, Wallet, Shield, History, MapPin } from 'lucide-react';
+import { Home, Search, Activity, User, Wallet, Shield, MapPin, Settings } from 'lucide-react';
+import { Program, AnchorProvider } from '@coral-xyz/anchor';
+import type { ConfirmedSignatureInfo } from '@solana/web3.js';
+import idl from './idl/merchant_link.json';
 
 const App: FC = () => {
   const [activeTab, setActiveTab] = useState('home');
   const { connected, publicKey } = useWallet();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const { connection } = useConnection();
+  const [realMerchants, setRealMerchants] = useState<any[]>([]);
+  const [realActivity, setRealActivity] = useState<ConfirmedSignatureInfo[]>([]);
+
+  useEffect(() => {
+    if (activeTab === 'explore' && connected) {
+      try {
+        const provider = new AnchorProvider(connection, {} as any, {});
+        const program = new Program(idl as any, provider);
+        (program.account as any).merchantState.all().then((data: any[]) => {
+          setRealMerchants(data);
+        }).catch(console.error);
+      } catch (e) { console.error(e) }
+    } else if (activeTab === 'activity' && connected && publicKey) {
+      connection.getSignaturesForAddress(publicKey, { limit: 10 })
+        .then(sigs => setRealActivity(sigs))
+        .catch(console.error);
+    }
+  }, [activeTab, connected, publicKey, connection]);
+
 
   // Load user profile from localStorage when wallet connects
   useEffect(() => {
@@ -74,22 +97,24 @@ const App: FC = () => {
       return (
         <div className="animate-slide-up" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h2 style={{ marginBottom: '8px' }}>Explore Deals</h2>
-          <div className="glass-panel" style={{ padding: '16px', display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <div style={{ width: '60px', height: '60px', borderRadius: '12px', background: '#e88a1a' }} />
-            <div style={{ flex: 1 }}>
-              <h4 style={{ margin: 0, fontSize: '1.1rem' }}>Sushi Master</h4>
-              <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>10% off Gift Cards</p>
-            </div>
-            <MapPin size={20} color="var(--primary)" />
-          </div>
-          <div className="glass-panel" style={{ padding: '16px', display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <div style={{ width: '60px', height: '60px', borderRadius: '12px', background: '#ff6b2c' }} />
-            <div style={{ flex: 1 }}>
-              <h4 style={{ margin: 0, fontSize: '1.1rem' }}>Coffee Co.</h4>
-              <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>Double Loyalty Pts</p>
-            </div>
-            <MapPin size={20} color="var(--primary)" />
-          </div>
+          {realMerchants.length === 0 ? (
+            <div style={{ color: 'var(--text-muted)' }}>No registered merchants found on Devnet.</div>
+          ) : (
+            realMerchants.map((merchant, idx) => (
+              <div key={idx} className="glass-panel" style={{ padding: '16px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div style={{ width: '60px', height: '60px', borderRadius: '12px', background: 'var(--primary-dim)' }} />
+                <div style={{ flex: 1, overflow: 'hidden' }}>
+                  <h4 style={{ margin: 0, fontSize: '1.1rem', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                    {merchant.account.merchantAdmin.toString().slice(0, 12)}...
+                  </h4>
+                  <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    Cards Sold: {merchant.account.cardsSold.toString()}
+                  </p>
+                </div>
+                <MapPin size={20} color="var(--primary)" />
+              </div>
+            ))
+          )}
         </div>
       );
     }
@@ -99,40 +124,28 @@ const App: FC = () => {
         <div className="animate-slide-up" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <h2 style={{ marginBottom: '8px' }}>Recent Activity</h2>
           <div className="glass-panel" style={{ padding: '16px' }}>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ background: 'var(--primary-dim)', padding: '10px', borderRadius: '12px' }}><ArrowUpRight size={20} color="var(--primary)" /></div>
-                <div>
-                  <div style={{ fontWeight: 600 }}>Purchased Gift Card</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>To: 8xDf...9kQ2</div>
+            {realActivity.length === 0 ? (
+              <div style={{ color: 'var(--text-muted)' }}>No recent activity found.</div>
+            ) : (
+              realActivity.map((tx, idx) => (
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: idx !== realActivity.length - 1 ? '16px' : '0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ border: '1px solid white', padding: '10px', borderRadius: '12px', background: 'transparent' }}>
+                      <Activity size={20} color="var(--text-main)" />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 600 }}>Transaction</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        {tx.signature.slice(0, 16)}...
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.8rem' }}>
+                    {tx.blockTime ? new Date(tx.blockTime * 1000).toLocaleDateString() : 'Recent'}
+                  </div>
                 </div>
-              </div>
-              <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>- 25 USDC</div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ background: 'rgba(0, 229, 255, 0.12)', padding: '10px', borderRadius: '12px' }}><ArrowDownLeft size={20} color="var(--secondary)" /></div>
-                <div>
-                  <div style={{ fontWeight: 600 }}>Received Gift Card</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>From: Bob's Cafe</div>
-                </div>
-              </div>
-              <div style={{ fontWeight: 700, color: 'var(--secondary)' }}>+ $10 Card</div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ background: 'var(--accent-dim)', padding: '10px', borderRadius: '12px' }}><History size={20} color="var(--accent)" /></div>
-                <div>
-                  <div style={{ fontWeight: 600 }}>Redeemed Points</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Sushi Master</div>
-                </div>
-              </div>
-              <div style={{ fontWeight: 700, color: 'var(--accent)' }}>- 500 Pts</div>
-            </div>
-
+              ))
+            )}
           </div>
         </div>
       );
@@ -154,7 +167,7 @@ const App: FC = () => {
           </div>
           
           <div className="glass-panel" style={{ padding: '16px' }}>
-            <h4 style={{ marginBottom: '16px', color: '#FFD700' }}>Account Settings</h4>
+            <h4 style={{ marginBottom: '16px', color: '#FFD700', display: 'flex', alignItems: 'center', gap: '8px' }}><Settings size={20} color="#FFD700" /> Account Settings</h4>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px', cursor: 'pointer' }}>
               <Shield size={20} color="var(--text-main)" /> 
