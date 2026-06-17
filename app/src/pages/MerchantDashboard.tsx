@@ -90,7 +90,8 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                 // Determine Merchant Admin Pubkey
                 let adminPubkey: PublicKey;
                 try {
-                    adminPubkey = buySource === 'platform' ? PLATFORM_ADMIN_PUBKEY : new PublicKey(merchantAddress);
+                    // For testing, "The Platform" defaults to your connected wallet!
+                    adminPubkey = buySource === 'platform' ? wallet.publicKey : new PublicKey(merchantAddress);
                 } catch (e) {
                     alert("Invalid Merchant Address!");
                     setIsLoading(false);
