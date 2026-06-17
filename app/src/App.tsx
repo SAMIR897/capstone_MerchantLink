@@ -131,7 +131,7 @@ const App: FC = () => {
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: idx !== realActivity.length - 1 ? '16px' : '0' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ border: '1px solid white', padding: '10px', borderRadius: '12px', background: 'transparent' }}>
-                      <Activity size={20} color="var(--text-main)" />
+                      <Activity size={20} color="var(--primary)" strokeWidth={3} />
                     </div>
                     <div>
                       <div style={{ fontWeight: 600 }}>Transaction</div>
@@ -167,7 +167,9 @@ const App: FC = () => {
           </div>
           
           <div className="glass-panel" style={{ padding: '16px' }}>
-            <h4 style={{ marginBottom: '16px', color: '#FFD700', display: 'flex', alignItems: 'center', gap: '8px' }}><Settings size={20} color="#FFD700" /> Account Settings</h4>
+            <h4 style={{ marginBottom: '16px', color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Settings size={20} color="var(--primary)" /> Account Settings
+            </h4>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px', cursor: 'pointer' }}>
               <Shield size={20} color="var(--text-main)" /> 
