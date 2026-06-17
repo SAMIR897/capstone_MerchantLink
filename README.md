@@ -53,7 +53,30 @@ To build the program locally:
 anchor build
 ```
 
+## 💻 Frontend dApp
 
+MerchantLink includes a fully functional, mobile-first Web3 dApp built with React and Vite. It serves as the main portal for both Merchants and Consumers.
+
+### Frontend Features
+*   **Wallet Integration**: Full integration with Solana wallet adapter (Phantom, Solflare, etc.).
+*   **Merchant Admin Panel**: Merchants can seamlessly initialize their protocol on Devnet, deploying their unique `MerchantState` and Gift Card Mints directly from the UI.
+*   **Consumer Dashboard**: Consumers can browse registered merchants, buy gift cards directly with Devnet USDC, and track their recent on-chain activity.
+*   **Live Blockchain Data**: The UI dynamically fetches real registered merchants and real transaction history directly from the Solana Devnet using `@coral-xyz/anchor` and `@solana/web3.js`.
+
+### Running the Frontend Locally
+
+```bash
+cd app
+npm install
+npm run dev
+```
+
+### End-to-End Devnet Testing Flow
+1. Connect your Phantom wallet (switched to Devnet).
+2. Get Devnet USDC from a standard SPL token faucet.
+3. Go to the **Profile** tab and scroll to **Initialize Protocol**.
+4. Enter your Devnet USDC Mint address and set a price. Click **Launch Protocol** to initialize your merchant profile on the blockchain.
+5. Go to the **Dashboard**, select **Buy from The Platform**, and purchase a gift card. The smart contract will automatically verify your state, deduct your USDC, and mint your Gift Card & Loyalty tokens!
 
 ---
 *Built for the Solana Turbin3 Capstone.*
