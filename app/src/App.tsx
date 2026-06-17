@@ -33,8 +33,6 @@ const App: FC = () => {
     setUserProfile(profile);
   };
 
-  // TEMPORARILY DISABLED: Login and Onboarding Gates
-  /*
   // If wallet is NOT connected, show the Login Screen
   if (!connected) {
     return (
@@ -66,7 +64,6 @@ const App: FC = () => {
       </>
     );
   }
-  */
 
   const renderTabContent = () => {
     // Home tab ALWAYS shows MerchantDashboard and passes the user profile down

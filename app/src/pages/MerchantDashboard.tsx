@@ -5,7 +5,6 @@ import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Store, Send, CheckCircle2, CreditCard, ShieldCheck, Gift, CircleCheck } from 'lucide-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import idl from '../idl/merchant_link.json';
 import type { UserProfile } from '../components/UserOnboarding';
 
@@ -43,15 +42,7 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
         return breakdown;
     };
 
-    const coupons = [
-        { sol: 1, img: '/1sol.png' },
-        { sol: 2, img: '/2sol.png' },
-        { sol: 5, img: '/5sol.png' },
-        { sol: 10, img: '/10sol.png' },
-        { sol: 20, img: '/20sol.png' },
-        { sol: 50, img: '/50sol.png' },
-        { sol: 100, img: '/100sol.png' },
-    ];
+    // Removed unused coupons array
     
     // Issue State
     const [issueAddress, setIssueAddress] = useState('');
@@ -96,100 +87,71 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                 
                 const breakdown = getCouponBreakdown(Number(inputAmount));
 
-                if (buySource === 'merchant') {
-                    console.log(`Executing SPL Token Transfer from ${merchantAddress} to Consumer...`);
-                    setTimeout(() => {
-                        setSuccessMsg(`Transfer complete! Breaking down into: ${breakdown.join(', ')} SOL`);
-                        setFlashCoupons(breakdown);
-                        setTimeout(() => { setSuccessMsg(''); setFlashCoupons(null); }, 4000);
-                        setIsLoading(false);
-                    }, 1500);
-                    return;
-                }
-
-                if (buySource === 'platform' && userProfile?.role === 'merchant') {
-                    console.log(`Executing Discounted Purchase: 20% OFF applied!`);
-                    setTimeout(() => {
-                        setSuccessMsg(`Purchase complete! Breaking down into: ${breakdown.join(', ')} SOL`);
-                        setFlashCoupons(breakdown);
-                        setTimeout(() => { setSuccessMsg(''); setFlashCoupons(null); }, 4000);
-                        setIsLoading(false);
-                    }, 1500);
-                    return;
-                }
-                
-                // Normal Platform Buy Flow for Customer
-                setTimeout(() => {
-                    setSuccessMsg(`Purchase complete! Breaking down into: ${breakdown.join(', ')} SOL`);
-                    setFlashCoupons(breakdown);
-                    setTimeout(() => { setSuccessMsg(''); setFlashCoupons(null); }, 4000);
-                    setIsLoading(false);
-                }, 1500);
-                return; // Early return for mock demo since buyGiftCard fails without correct amount argument.
-            }
-
-            if (actionType === 'buy' || (actionType === 'issue' && issueSource !== 'collection')) {
                 // Determine Merchant Admin Pubkey
                 let adminPubkey: PublicKey;
                 try {
-                    if (actionType === 'buy') {
-                        adminPubkey = PLATFORM_ADMIN_PUBKEY;
-                    } else {
-                        adminPubkey = issueSource === 'buy_platform' ? PLATFORM_ADMIN_PUBKEY : new PublicKey(issueMerchantAddress);
-                    }
+                    adminPubkey = buySource === 'platform' ? PLATFORM_ADMIN_PUBKEY : new PublicKey(merchantAddress);
                 } catch (e) {
-                    throw new Error("Invalid Merchant Address!");
+                    alert("Invalid Merchant Address!");
+                    setIsLoading(false);
+                    return;
                 }
 
-                // Fetch Merchant State
-                const [merchantStatePda] = PublicKey.findProgramAddressSync(
-                    [Buffer.from("merchant"), adminPubkey.toBuffer()],
-                    PROGRAM_ID
-                );
-                
-                const merchantState = await (program.account as any).merchantState.fetch(merchantStatePda);
+                try {
+                    // Fetch Merchant State
+                    const [merchantStatePda] = PublicKey.findProgramAddressSync(
+                        [Buffer.from("merchant"), adminPubkey.toBuffer()],
+                        PROGRAM_ID
+                    );
+                    
+                    const merchantState = await (program.account as any).merchantState.fetch(merchantStatePda);
 
-                // ATAs
-                const consumerUsdcAta = getAssociatedTokenAddressSync(merchantState.usdcMint, wallet.publicKey, false, TOKEN_PROGRAM_ID);
-                const consumerGiftCardAta = getAssociatedTokenAddressSync(merchantState.giftCardMint, wallet.publicKey, false, TOKEN_2022_PROGRAM_ID);
-                const consumerLoyaltyAta = getAssociatedTokenAddressSync(merchantState.loyaltyMint, wallet.publicKey, false, TOKEN_2022_PROGRAM_ID);
+                    // ATAs
+                    const consumerUsdcAta = getAssociatedTokenAddressSync(merchantState.usdcMint, wallet.publicKey, false, TOKEN_PROGRAM_ID);
+                    const consumerGiftCardAta = getAssociatedTokenAddressSync(merchantState.giftCardMint, wallet.publicKey, false, TOKEN_2022_PROGRAM_ID);
+                    const consumerLoyaltyAta = getAssociatedTokenAddressSync(merchantState.loyaltyMint, wallet.publicKey, false, TOKEN_2022_PROGRAM_ID);
 
-                // Execute buy_gift_card on the blockchain!
-                const tx = await program.methods.buyGiftCard()
-                    .accounts({
-                        consumer: wallet.publicKey,
-                        merchantState: merchantStatePda,
-                        usdcMint: merchantState.usdcMint,
-                        consumerUsdcAta: consumerUsdcAta,
-                        merchantUsdcAta: merchantState.usdcTokenAccount,
-                        giftCardMint: merchantState.giftCardMint,
-                        consumerGiftCardAta: consumerGiftCardAta,
-                        loyaltyMint: merchantState.loyaltyMint,
-                        consumerLoyaltyAta: consumerLoyaltyAta,
-                        tokenProgram: TOKEN_PROGRAM_ID,
-                        tokenProgram2022: TOKEN_2022_PROGRAM_ID,
-                        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-                        systemProgram: SystemProgram.programId,
-                    })
-                    .rpc();
+                    // Execute buy_gift_card on the blockchain!
+                    const tx = await program.methods.buyGiftCard()
+                        .accounts({
+                            consumer: wallet.publicKey,
+                            merchantState: merchantStatePda,
+                            usdcMint: merchantState.usdcMint,
+                            consumerUsdcAta: consumerUsdcAta,
+                            merchantUsdcAta: merchantState.usdcTokenAccount,
+                            giftCardMint: merchantState.giftCardMint,
+                            consumerGiftCardAta: consumerGiftCardAta,
+                            loyaltyMint: merchantState.loyaltyMint,
+                            consumerLoyaltyAta: consumerLoyaltyAta,
+                            tokenProgram: TOKEN_PROGRAM_ID,
+                            tokenProgram2022: TOKEN_2022_PROGRAM_ID,
+                            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                            systemProgram: SystemProgram.programId,
+                        })
+                        .rpc();
 
-                setTxHash(tx);
-                setSuccessMsg('Transaction Successful!');
-                
-                // If it's an Issue flow, we'd normally transfer the Giftcard token here via standard SPL transfer
-                if (actionType === 'issue') {
-                    console.log(`Need to execute SPL Transfer to ${issueAddress}`);
+                    setTxHash(tx);
+                    setSuccessMsg(`Purchase complete! Breaking down into: ${breakdown.join(', ')} SOL`);
+                    setFlashCoupons(breakdown);
+                    setTimeout(() => { setSuccessMsg(''); setFlashCoupons(null); }, 4000);
+                } catch (e: any) {
+                    console.error("Transaction failed:", e);
+                    alert("Transaction failed: " + e.message);
+                } finally {
+                    setIsLoading(false);
                 }
-                
-                setTimeout(() => setSuccessMsg(''), 5000);
+                return;
+            }
 
-            } else if (actionType === 'issue' && issueSource === 'collection') {
-                // Just an SPL token transfer mock for now
+            // Mock Issue Flow
+            if (actionType === 'issue') {
                 setTimeout(() => {
-                    setSuccessMsg('Gift card issued from collection!');
+                    setSuccessMsg('Gift card issued successfully!');
                     setTimeout(() => setSuccessMsg(''), 4000);
+                    setIsLoading(false);
                 }, 1000);
             }
+
 
         } catch (error: any) {
             console.error("Tx Failed:", error);
@@ -251,16 +213,16 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                 {/* BUY FLOW */}
                 {actionType === 'buy' && (
                     <div className="animate-slide-up">
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '12px', lineHeight: 1.5 }}>
+                        <p style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '0.85rem', marginBottom: '20px', lineHeight: 1.5 }}>
                             Purchase a new gift card for yourself. Choose the source below.
                         </p>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', border: '1px solid var(--border)', borderRadius: '10px', background: buySource === 'platform' ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.2s' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', border: '1.5px solid rgba(255,255,255,0.5)', borderRadius: '10px', background: buySource === 'platform' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.2)', transition: 'all 0.2s' }}>
                                 <input type="radio" checked={buySource === 'platform'} onChange={() => setBuySource('platform')} style={{ accentColor: 'var(--primary)' }} />
                                 <span style={{ color: 'var(--text-main)', fontWeight: 400, fontSize: '0.8rem' }}>Buy from The Platform</span>
                             </label>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', border: '1px solid var(--border)', borderRadius: '10px', background: buySource === 'merchant' ? 'rgba(255,255,255,0.05)' : 'transparent', transition: 'all 0.2s' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px', border: '1.5px solid rgba(255,255,255,0.5)', borderRadius: '10px', background: buySource === 'merchant' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.2)', transition: 'all 0.2s' }}>
                                 <input type="radio" checked={buySource === 'merchant'} onChange={() => setBuySource('merchant')} style={{ accentColor: 'var(--primary)' }} />
                                 <span style={{ color: 'var(--text-main)', fontWeight: 400, fontSize: '0.8rem' }}>Buy from Any Merchant</span>
                             </label>
@@ -268,7 +230,7 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
 
                         {buySource === 'platform' && (
                             <div className="animate-slide-up form-group" style={{ marginBottom: '20px' }}>
-                                <label className="input-label" style={{ marginBottom: '12px', display: 'block' }}>Enter Amount (SOL)</label>
+                                <label className="input-label" style={{ color: '#FFFFFF', fontWeight: 'bold', marginBottom: '12px', display: 'block' }}>Enter Amount (SOL)</label>
                                 <div className="input-group">
                                     <input 
                                         type="number" 
