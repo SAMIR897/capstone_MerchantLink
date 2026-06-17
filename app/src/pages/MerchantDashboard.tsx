@@ -198,13 +198,13 @@ export const MerchantDashboard: FC<MerchantDashboardProps> = ({ userProfile }) =
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
                     <button 
                         onClick={() => { setActionType('buy'); setSuccessMsg(''); }}
-                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'buy' ? 'var(--primary)' : 'var(--border)'}`, background: actionType === 'buy' ? 'var(--primary-dim)' : 'transparent', color: actionType === 'buy' ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'buy' ? 'var(--primary)' : '#FFFFFF'}`, background: actionType === 'buy' ? 'var(--primary-dim)' : 'transparent', color: actionType === 'buy' ? 'var(--primary)' : '#FFFFFF', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
                     >
                         Buy Giftcard
                     </button>
                     <button 
                         onClick={() => { setActionType('issue'); setSuccessMsg(''); }}
-                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'issue' ? 'var(--secondary)' : 'var(--border)'}`, background: actionType === 'issue' ? 'rgba(51,255,170,0.1)' : 'transparent', color: actionType === 'issue' ? 'var(--secondary)' : 'var(--text-muted)', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                        style={{ flex: 1, padding: '10px', borderRadius: '12px', border: `1px solid ${actionType === 'issue' ? 'var(--secondary)' : '#FFFFFF'}`, background: actionType === 'issue' ? 'rgba(51,255,170,0.1)' : 'transparent', color: actionType === 'issue' ? 'var(--secondary)' : '#FFFFFF', fontWeight: 500, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}
                     >
                         Issue a Gift Card
                     </button>
