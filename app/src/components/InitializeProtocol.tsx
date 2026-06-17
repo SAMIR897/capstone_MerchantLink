@@ -87,12 +87,12 @@ export const InitializeProtocol: FC = () => {
                 <span className="section-badge">Admin</span>
             </div>
 
-            <p className="section-desc" style={{ fontSize: '0.85rem' }}>
+            <p className="section-desc" style={{ fontSize: '0.85rem', color: '#FFFFFF', fontWeight: 'bold' }}>
                 Deploy your MerchantLink instance. This makes you the owner of a new merchant dApp instance!
             </p>
 
             <div className="form-group" style={{ marginBottom: '12px' }}>
-                <label className="input-label" style={{ fontSize: '0.8rem' }}>Token Mint (USDC)</label>
+                <label className="input-label" style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 'bold' }}>Token Mint (USDC)</label>
                 <div className="input-group">
                     <Coins className="input-icon" size={16} />
                     <input 
@@ -107,7 +107,7 @@ export const InitializeProtocol: FC = () => {
             </div>
 
             <div className="form-group" style={{ marginBottom: '16px' }}>
-                <label className="input-label" style={{ fontSize: '0.8rem' }}>Gift Card Price (USDC)</label>
+                <label className="input-label" style={{ fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 'bold' }}>Gift Card Price (USDC)</label>
                 <div className="input-group">
                     <Wallet className="input-icon" size={16} />
                     <input 

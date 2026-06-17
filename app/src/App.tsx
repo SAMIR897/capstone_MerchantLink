@@ -154,7 +154,7 @@ const App: FC = () => {
           </div>
           
           <div className="glass-panel" style={{ padding: '16px' }}>
-            <h4 style={{ marginBottom: '16px', color: 'var(--text-muted)' }}>Account Settings</h4>
+            <h4 style={{ marginBottom: '16px', color: '#FFD700' }}>Account Settings</h4>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px', cursor: 'pointer' }}>
               <Shield size={20} color="var(--text-main)" /> 
