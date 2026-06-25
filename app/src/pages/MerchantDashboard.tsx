@@ -10,8 +10,6 @@ import type { UserProfile } from '../components/UserOnboarding';
 
 const PROGRAM_ID = new PublicKey((idl as any).address || "Do2bnhgFrAxQbGB4woahzBKyQZm4efHaDnk2FQzSVsJh");
 
-// The "Platform" Merchant Admin Wallet (Your Local CLI Wallet)
-const PLATFORM_ADMIN_PUBKEY = new PublicKey("Awx1ouo1h4svLsLRP2KvKYmfYGm6HamYcqyKuY4B9Uye"); 
 
 interface MerchantDashboardProps {
     userProfile: UserProfile | null;

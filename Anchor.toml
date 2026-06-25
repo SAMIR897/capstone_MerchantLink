@@ -8,8 +8,11 @@ skip-lint = false
 [programs.localnet]
 merchant_link = "Do2bnhgFrAxQbGB4woahzBKyQZm4efHaDnk2FQzSVsJh"
 
+[programs.devnet]
+merchant_link = "Do2bnhgFrAxQbGB4woahzBKyQZm4efHaDnk2FQzSVsJh"
+
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
